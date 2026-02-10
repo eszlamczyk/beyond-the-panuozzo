@@ -31,6 +31,22 @@
 $ npm install
 ```
 
+## Environment variables
+
+Copy the example file and fill in the values:
+
+```bash
+$ cp .env.example .env
+```
+
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 Client ID from [Google Cloud Console](https://console.cloud.google.com/apis/credentials) |
+| `GOOGLE_CLIENT_SECRET` | OAuth 2.0 Client Secret from Google Cloud Console |
+| `GOOGLE_CALLBACK_URL` | The callback URL registered in Google Console (default: `http://localhost:3000/auth/google/callback`) |
+| `JWT_SECRET` | Secret key used to sign JWTs. Use a long random string |
+| `ALLOWED_REDIRECT_URIS` | Comma-separated list of URIs the auth flow is allowed to redirect to after login (e.g. `vscode://eszlamczyk.beyond-the-panuozzo/auth,http://localhost:3000/callback`) |
+
 ## Compile and run the project
 
 ```bash
