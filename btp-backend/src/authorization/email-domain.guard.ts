@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import type { Request } from 'express';
+import { jwtPayloadSchema } from '../authentication/jwt-payload.schema';
 import { authorizationConfig } from './authorization.config';
 
 /**
@@ -25,12 +26,13 @@ export class EmailDomainGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const user = request.user as { email?: string } | undefined;
+    const result = jwtPayloadSchema.safeParse(request.user);
 
-    if (!user?.email?.endsWith(`@${this.config.allowedEmailDomain}`)) {
-      throw new UnauthorizedException(
-        'Email domain not allowed.',
-      );
+    if (
+      !result.success ||
+      !result.data.email.endsWith(`@${this.config.allowedEmailDomain}`)
+    ) {
+      throw new UnauthorizedException('Email domain not allowed.');
     }
 
     return true;

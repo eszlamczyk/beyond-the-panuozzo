@@ -1,5 +1,5 @@
-import { JwtStrategy, JwtPayload } from './jwt.strategy';
-
+import { JwtStrategy } from './jwt.strategy';
+import { JwtPayload } from './jwt-payload.schema';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;

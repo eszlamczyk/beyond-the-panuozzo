@@ -3,13 +3,7 @@ import type { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { authenticationConfig } from './authentication.config';
-
-/** Shape of the validated JWT payload attached to `req.user`. */
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  name: string;
-}
+import { JwtPayload } from './jwt-payload.schema';
 
 /**
  * Passport strategy that validates JWT bearer tokens.

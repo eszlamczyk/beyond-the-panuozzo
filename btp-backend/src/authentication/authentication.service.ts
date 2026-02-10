@@ -3,7 +3,7 @@ import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { z } from 'zod';
 import { authenticationConfig } from './authentication.config';
-import { GoogleUser } from './google.strategy';
+import { GoogleUser } from './google-user.schema';
 
 /** Schema for the payload encoded into Google OAuth's `state` parameter. */
 const statePayloadSchema = z.object({

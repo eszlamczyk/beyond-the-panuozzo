@@ -18,7 +18,10 @@ const googleAuthQuerySchema = z.object({
 /** Google authentication guard */
 @Injectable()
 export class GoogleAuthenticationGuard extends AuthGuard('google') {
-  constructor(@Inject(AuthenticationService) private readonly authenticationService: AuthenticationService) {
+  constructor(
+    @Inject(AuthenticationService)
+    private readonly authenticationService: AuthenticationService,
+  ) {
     super();
   }
 
@@ -50,7 +53,11 @@ export class GoogleAuthenticationGuard extends AuthGuard('google') {
     const result = googleAuthQuerySchema.safeParse(request.query);
 
     if (result.success) {
-      if (!this.authenticationService.validateRedirectUri(result.data.redirect_uri)) {
+      if (
+        !this.authenticationService.validateRedirectUri(
+          result.data.redirect_uri,
+        )
+      ) {
         throw new BadRequestException(
           'Invalid redirect_uri. Must be a whitelisted URI.',
         );

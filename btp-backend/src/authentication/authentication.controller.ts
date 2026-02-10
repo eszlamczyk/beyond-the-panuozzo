@@ -14,7 +14,7 @@ import type { Response, Request } from 'express';
 import { authorizationConfig } from '../authorization/authorization.config';
 import { AuthenticationService } from './authentication.service';
 import { GoogleAuthenticationGuard } from './google-authentication.guard';
-import { GoogleUser } from './google.strategy';
+import { googleUserSchema } from './google-user.schema';
 
 /**
  * Handles the Google OAuth 2.0 login flow requests.
@@ -65,8 +65,14 @@ export class AuthenticationController {
     @Query('state') state: string,
     @Res() res: Response,
   ): void {
-    const user = req.user as GoogleUser;
-    const { redirectUri, clientState } = this.authenticationService.decodeState(state);
+    const result = googleUserSchema.safeParse(req.user);
+    if (!result.success) {
+      throw new UnauthorizedException('Invalid user profile.');
+    }
+
+    const user = result.data;
+    const { redirectUri, clientState } =
+      this.authenticationService.decodeState(state);
 
     if (!this.authenticationService.validateRedirectUri(redirectUri)) {
       throw new BadRequestException('Invalid redirect_uri in state.');

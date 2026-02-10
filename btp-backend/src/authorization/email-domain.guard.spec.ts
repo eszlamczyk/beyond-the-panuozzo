@@ -17,17 +17,25 @@ describe('EmailDomainGuard', () => {
   });
 
   it('should allow a user with the correct email domain', () => {
-    const ctx = createMockContext({ email: 'alice@example.com' });
+    const ctx = createMockContext({
+      sub: '1',
+      email: 'alice@example.com',
+      name: 'Alice',
+    });
     expect(guard.canActivate(ctx)).toBe(true);
   });
 
   it('should reject a user with a different email domain', () => {
-    const ctx = createMockContext({ email: 'alice@evil.com' });
+    const ctx = createMockContext({
+      sub: '1',
+      email: 'alice@evil.com',
+      name: 'Alice',
+    });
     expect(() => guard.canActivate(ctx)).toThrow(UnauthorizedException);
   });
 
   it('should reject a user with no email', () => {
-    const ctx = createMockContext({ name: 'No Email' });
+    const ctx = createMockContext({ sub: '1', name: 'No Email' });
     expect(() => guard.canActivate(ctx)).toThrow(UnauthorizedException);
   });
 
@@ -37,7 +45,11 @@ describe('EmailDomainGuard', () => {
   });
 
   it('should not match a domain that is a suffix of the allowed domain', () => {
-    const ctx = createMockContext({ email: 'alice@notexample.com' });
+    const ctx = createMockContext({
+      sub: '1',
+      email: 'alice@notexample.com',
+      name: 'Alice',
+    });
     expect(() => guard.canActivate(ctx)).toThrow(UnauthorizedException);
   });
 });

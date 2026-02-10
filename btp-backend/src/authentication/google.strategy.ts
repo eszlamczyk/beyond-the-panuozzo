@@ -3,14 +3,7 @@ import type { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { authenticationConfig } from './authentication.config';
-
-/** Normalized user profile returned by the Google OAuth strategy. */
-export interface GoogleUser {
-  googleId: string;
-  email: string;
-  displayName: string;
-  photo: string | undefined;
-}
+import { GoogleUser } from './google-user.schema';
 
 const REQUIRED_SCOPES = ['email', 'profile'];
 
