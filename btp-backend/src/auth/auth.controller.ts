@@ -32,12 +32,18 @@ import { GoogleUser } from './google.strategy';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  /** Initiates the Google OAuth flow. The guard validates `redirect_uri` and redirects to Google. */
+  /**
+   * Initiates the Google OAuth flow.
+   *
+   * The method body is intentionally empty because the {@link GoogleAuthGuard}
+   * intercepts the request before this method executes: it validates the
+   * `redirect_uri`, encodes it into the OAuth `state` parameter, and issues a
+   * 302 redirect to Google's consent screen. The browser never reaches this
+   * method body — it only exists so NestJS registers the route.
+   */
   @Get('google')
   @UseGuards(GoogleAuthGuard)
-  googleAuth(): void {
-    // Guard validates redirect_uri and handles redirect to Google
-  }
+  googleAuth(): void {}
 
   /**
    * Handles Google's OAuth callback. Exchanges the authorization code for a
