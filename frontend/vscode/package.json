@@ -47,14 +47,7 @@
       }
     ],
     "configuration": {
-      "title": "Beyond the Panuozzo",
-      "properties": {
-        "btp.backendUrl": {
-          "type": "string",
-          "default": "http://localhost:3000",
-          "description": "URL of the Beyond the Panuozzo backend server."
-        }
-      }
+      "title": "Beyond the Panuozzo"
     }
   },
   "scripts": {
