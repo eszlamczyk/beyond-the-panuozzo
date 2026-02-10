@@ -3,27 +3,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
+import { AppDataSource } from './data-source';
+import { FoodsModule } from './foods/foods.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT ?? '5432'),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      migrations: [__dirname + '/migration/**/*{.js,.ts}'],
-      migrationsRun: false,
-      migrationsTransactionMode: 'all',
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(AppDataSource.options),
 
     OrdersModule,
     UsersModule,
-    OrdersModule,
+    FoodsModule,
   ],
 })
 export class AppModule {}
