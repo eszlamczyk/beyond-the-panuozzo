@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationService } from './authentication.service';
 import { authenticationConfig } from './authentication.config';
-import { GoogleUser } from './google.strategy';
+import { GoogleUser } from './google-user.schema';
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;

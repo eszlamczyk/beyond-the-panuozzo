@@ -1,11 +1,12 @@
-import { JwtStrategy } from './jwt.strategy';
+import { AuthenticationConfig } from './authentication.config';
 import { JwtPayload } from './jwt-payload.schema';
+import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
 
   beforeEach(() => {
-    const mockConfig = {
+    const mockConfig: AuthenticationConfig = {
       google: {
         clientId: 'test-client-id',
         clientSecret: 'test-client-secret',
@@ -15,7 +16,7 @@ describe('JwtStrategy', () => {
       allowedRedirectUris: [],
     };
 
-    strategy = new JwtStrategy(mockConfig as any);
+    strategy = new JwtStrategy(mockConfig);
   });
 
   it('should return the payload as-is', () => {
