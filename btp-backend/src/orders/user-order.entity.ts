@@ -15,6 +15,6 @@ export class UserOrder {
   order: Order;
 
   @ManyToOne(() => Food)
-  @JoinColumn({ name: 'food_id' }) // Optional: customizes column name in DB
+  @JoinColumn({ name: 'food_id' })
   food: Food;
 }
