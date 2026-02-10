@@ -6,7 +6,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
+import { z } from 'zod';
 import { AuthService } from './auth.service';
+
+/** Expected query parameters for auth request. */
+const googleAuthQuerySchema = z.object({
+  redirect_uri: z.string().min(1),
+  state: z.string().optional(),
+});
 
 /** Google authentication guard */
 @Injectable()
@@ -29,8 +36,8 @@ export class GoogleAuthGuard extends AuthGuard('google') {
    */
   getAuthenticateOptions(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
-    const redirectUri = (request.query?.redirect_uri as string) ?? undefined;
-    const clientState = (request.query?.state as string) ?? undefined;
+    const { redirect_uri: redirectUri, state: clientState } =
+      googleAuthQuerySchema.partial().parse(request.query);
 
     const statePayload = JSON.stringify({ redirectUri, clientState });
     const encodedState = Buffer.from(statePayload).toString('base64url');
@@ -38,14 +45,12 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     return { state: encodedState };
   }
 
-  /**
-   * Ensures the request carries a valid, allowed redirect URI.
-   */
+  /** Ensures the request carries a valid, allowed redirect URI. */
   private assertValidRedirectUri(request: Request): void {
-    const redirectUri = request.query?.redirect_uri as string | undefined;
+    const result = googleAuthQuerySchema.safeParse(request.query);
 
-    if (redirectUri !== undefined) {
-      if (!this.authService.validateRedirectUri(redirectUri)) {
+    if (result.success) {
+      if (!this.authService.validateRedirectUri(result.data.redirect_uri)) {
         throw new BadRequestException(
           'Invalid redirect_uri. Must be a whitelisted URI.',
         );

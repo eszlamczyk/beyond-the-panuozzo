@@ -1,14 +1,18 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { z } from 'zod';
 import { authConfig } from './auth.config';
 import { GoogleUser } from './google.strategy';
 
+/** Schema for the payload encoded into Google OAuth's `state` parameter. */
+const statePayloadSchema = z.object({
+  redirectUri: z.string().min(1),
+  clientState: z.string().optional(),
+});
+
 /** Shape of the payload encoded into Google OAuth's `state` parameter. */
-export interface StatePayload {
-  redirectUri: string;
-  clientState: string | undefined;
-}
+export type StatePayload = z.infer<typeof statePayloadSchema>;
 
 /**
  * Core authentication helpers.
@@ -45,18 +49,15 @@ export class AuthService {
     return Buffer.from(JSON.stringify(payload)).toString('base64url');
   }
 
-  /** Decodes a base64url-encoded `state` string back into a {@link StatePayload}. Throws if `redirectUri` is missing. */
+  /** Decodes a base64url-encoded `state` string back into a {@link StatePayload}. Throws if the payload is invalid. */
   decodeState(state: string): StatePayload {
     const json = Buffer.from(state, 'base64url').toString('utf-8');
-    const parsed = JSON.parse(json) as Partial<StatePayload>;
+    const result = statePayloadSchema.safeParse(JSON.parse(json));
 
-    if (!parsed.redirectUri) {
-      throw new BadRequestException('Missing redirectUri in state payload.');
+    if (!result.success) {
+      throw new BadRequestException('Invalid state payload.');
     }
 
-    return {
-      redirectUri: parsed.redirectUri,
-      clientState: parsed.clientState,
-    };
+    return result.data;
   }
 }
