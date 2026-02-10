@@ -23,7 +23,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        directory: [btb-backend]
+        directory: [btp-backend]
     uses: ./.github/workflows/build.yml
     with:
       directory: ${{ matrix.directory }}
