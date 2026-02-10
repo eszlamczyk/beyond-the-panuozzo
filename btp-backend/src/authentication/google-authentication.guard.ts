@@ -7,9 +7,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { z } from 'zod';
-import { AuthService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 
-/** Expected query parameters for auth request. */
+/** Expected query parameters for authentication request. */
 const googleAuthQuerySchema = z.object({
   redirect_uri: z.string().min(1),
   state: z.string().optional(),
@@ -17,8 +17,8 @@ const googleAuthQuerySchema = z.object({
 
 /** Google authentication guard */
 @Injectable()
-export class GoogleAuthGuard extends AuthGuard('google') {
-  constructor(@Inject(AuthService) private readonly authService: AuthService) {
+export class GoogleAuthenticationGuard extends AuthGuard('google') {
+  constructor(@Inject(AuthenticationService) private readonly authenticationService: AuthenticationService) {
     super();
   }
 
@@ -50,7 +50,7 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     const result = googleAuthQuerySchema.safeParse(request.query);
 
     if (result.success) {
-      if (!this.authService.validateRedirectUri(result.data.redirect_uri)) {
+      if (!this.authenticationService.validateRedirectUri(result.data.redirect_uri)) {
         throw new BadRequestException(
           'Invalid redirect_uri. Must be a whitelisted URI.',
         );

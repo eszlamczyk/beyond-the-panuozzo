@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { z } from 'zod';
-import { authConfig } from './auth.config';
+import { authenticationConfig } from './authentication.config';
 import { GoogleUser } from './google.strategy';
 
 /** Schema for the payload encoded into Google OAuth's `state` parameter. */
@@ -22,11 +22,11 @@ export type StatePayload = z.infer<typeof statePayloadSchema>;
  * through the Google OAuth round-trip.
  */
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
-    @Inject(authConfig.KEY)
-    private readonly config: ConfigType<typeof authConfig>,
+    @Inject(authenticationConfig.KEY)
+    private readonly config: ConfigType<typeof authenticationConfig>,
   ) {}
 
   /** Returns `true` if the URI is present in the configured whitelist */

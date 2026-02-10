@@ -2,14 +2,18 @@ import {
   BadRequestException,
   Controller,
   Get,
+  Inject,
   Query,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import type { ConfigType } from '@nestjs/config';
 import type { Response, Request } from 'express';
-import { AuthService } from './auth.service';
-import { GoogleAuthGuard } from './google-auth.guard';
+import { authorizationConfig } from '../authorization/authorization.config';
+import { AuthenticationService } from './authentication.service';
+import { GoogleAuthenticationGuard } from './google-authentication.guard';
 import { GoogleUser } from './google.strategy';
 
 /**
@@ -17,7 +21,7 @@ import { GoogleUser } from './google.strategy';
  *
  * Flow:
  * 1. Client visits `GET /auth/google?redirect_uri=<whitelisted_uri>[&state=<opaque>]`.
- * 2. The {@link GoogleAuthGuard} validates the redirect URI, encodes it into
+ * 2. The {@link GoogleAuthenticationGuard} validates the redirect URI, encodes it into
  *    Google's `state` parameter, and redirects the browser to Google's consent screen.
  * 3. After the user authenticates, Google redirects back to
  *    `GET /auth/google/callback?code=…&state=…`.
@@ -29,20 +33,24 @@ import { GoogleUser } from './google.strategy';
  * does not hang on an unresolvable redirect.
  */
 @Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+export class AuthenticationController {
+  constructor(
+    private readonly authenticationService: AuthenticationService,
+    @Inject(authorizationConfig.KEY)
+    private readonly authzConfig: ConfigType<typeof authorizationConfig>,
+  ) {}
 
   /**
    * Initiates the Google OAuth flow.
    *
-   * The method body is intentionally empty because the {@link GoogleAuthGuard}
+   * The method body is intentionally empty because the {@link GoogleAuthenticationGuard}
    * intercepts the request before this method executes: it validates the
    * `redirect_uri`, encodes it into the OAuth `state` parameter, and issues a
    * 302 redirect to Google's consent screen. The browser never reaches this
    * method body — it only exists so NestJS registers the route.
    */
   @Get('google')
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(GoogleAuthenticationGuard)
   googleAuth(): void {}
 
   /**
@@ -51,20 +59,24 @@ export class AuthController {
    * client redirect URI with the token attached as a query parameter.
    */
   @Get('google/callback')
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(GoogleAuthenticationGuard)
   googleCallback(
     @Req() req: Request,
     @Query('state') state: string,
     @Res() res: Response,
   ): void {
     const user = req.user as GoogleUser;
-    const { redirectUri, clientState } = this.authService.decodeState(state);
+    const { redirectUri, clientState } = this.authenticationService.decodeState(state);
 
-    if (!this.authService.validateRedirectUri(redirectUri)) {
+    if (!this.authenticationService.validateRedirectUri(redirectUri)) {
       throw new BadRequestException('Invalid redirect_uri in state.');
     }
 
-    const token = this.authService.generateJwt(user);
+    if (!user.email.endsWith(`@${this.authzConfig.allowedEmailDomain}`)) {
+      throw new UnauthorizedException('Email domain not allowed.');
+    }
+
+    const token = this.authenticationService.generateJwt(user);
 
     const url = new URL(redirectUri);
     url.searchParams.set('token', token);
