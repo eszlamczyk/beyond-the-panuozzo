@@ -60,7 +60,7 @@ export class AuthController {
     const user = req.user as GoogleUser;
     const { redirectUri, clientState } = this.authService.decodeState(state);
 
-    if (!redirectUri || !this.authService.validateRedirectUri(redirectUri)) {
+    if (!this.authService.validateRedirectUri(redirectUri)) {
       throw new BadRequestException('Invalid redirect_uri in state.');
     }
 

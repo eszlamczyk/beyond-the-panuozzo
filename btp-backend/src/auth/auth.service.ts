@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { authConfig } from './auth.config';
@@ -6,7 +6,7 @@ import { GoogleUser } from './google.strategy';
 
 /** Shape of the payload encoded into Google OAuth's `state` parameter. */
 export interface StatePayload {
-  redirectUri: string | undefined;
+  redirectUri: string;
   clientState: string | undefined;
 }
 
@@ -45,9 +45,18 @@ export class AuthService {
     return Buffer.from(JSON.stringify(payload)).toString('base64url');
   }
 
-  /** Decodes a base64url-encoded `state` string back into a {@link StatePayload}. */
+  /** Decodes a base64url-encoded `state` string back into a {@link StatePayload}. Throws if `redirectUri` is missing. */
   decodeState(state: string): StatePayload {
     const json = Buffer.from(state, 'base64url').toString('utf-8');
-    return JSON.parse(json) as StatePayload;
+    const parsed = JSON.parse(json) as Partial<StatePayload>;
+
+    if (!parsed.redirectUri) {
+      throw new BadRequestException('Missing redirectUri in state payload.');
+    }
+
+    return {
+      redirectUri: parsed.redirectUri,
+      clientState: parsed.clientState,
+    };
   }
 }
