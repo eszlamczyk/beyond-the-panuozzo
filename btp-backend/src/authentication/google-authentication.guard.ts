@@ -26,7 +26,7 @@ export class GoogleAuthenticationGuard extends AuthGuard('google') {
   }
 
   /** Validates the redirect URI before delegating to Passport's Google strategy. */
-  canActivate(context: ExecutionContext) {
+  override canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
     this.assertValidRedirectUri(request);
     return super.canActivate(context);
@@ -37,7 +37,7 @@ export class GoogleAuthenticationGuard extends AuthGuard('google') {
    * OAuth `state` parameter so they survive the round-trip without requiring
    * server-side sessions.
    */
-  getAuthenticateOptions(context: ExecutionContext) {
+  override getAuthenticateOptions(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
     const { redirect_uri: redirectUri, state: clientState } =
       googleAuthQuerySchema.partial().parse(request.query);
