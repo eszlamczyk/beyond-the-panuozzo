@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  assign_author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: toshimaru/auto-author-assign@v2.1.1
+
+
+  build:
+    if: '! github.event.pull_request.draft'
+    name: Build
+    strategy:
+      matrix:
+        directory: [btp-backend]
+    uses: ./.github/workflows/build.yml
+    with:
+      directory: ${{ matrix.directory }}
+    secrets: inherit
