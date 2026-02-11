@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationService } from './authentication.service';
 import { authenticationConfig } from './authentication.config';
-import { GoogleUser } from './google-user.schema';
+import type { GoogleUser } from './google-user.schema';
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;

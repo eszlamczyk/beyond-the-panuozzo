@@ -1,5 +1,5 @@
-import { AuthenticationConfig } from './authentication.config';
-import { JwtPayload } from './jwt-payload.schema';
+import type { AuthenticationConfig } from './authentication.config';
+import type { JwtPayload } from './jwt-payload.schema';
 import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
