@@ -6,15 +6,15 @@ import { Food } from '../foods/food.entity';
 @Entity('user_orders')
 export class UserOrder {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => User, (user) => user.items)
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Order, (order) => order.items)
-  order: Order;
+  order!: Order;
 
   @ManyToOne(() => Food)
   @JoinColumn({ name: 'food_id' })
-  food: Food;
+  food!: Food;
 }

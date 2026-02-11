@@ -5,23 +5,23 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  firstName: string;
+  firstName!: string;
 
   @Column()
-  lastName: string;
+  lastName!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column()
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @OneToMany(() => Order, (order) => order.manager)
-  managedOrders: Order[];
+  managedOrders!: Order[];
 
   @OneToMany(() => UserOrder, (userOrder) => userOrder.user)
-  items: UserOrder[];
+  items!: UserOrder[];
 }

@@ -11,20 +11,20 @@ import { UserOrder } from '../orders/user-order.entity';
 @Entity('foods')
 export class Food {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column({
     type: 'int',
     comment: 'Price in `grosze`',
   })
-  price: number;
+  price!: number;
 
   @OneToMany(() => UserOrder, (userOrder) => userOrder.food)
-  userOrders: UserOrder[];
+  userOrders!: UserOrder[];
 
   @ManyToOne(() => FoodType, (foodType) => foodType.foods)
-  type: FoodType;
+  type!: FoodType;
 }

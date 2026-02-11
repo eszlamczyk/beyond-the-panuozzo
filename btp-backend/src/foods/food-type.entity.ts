@@ -4,11 +4,11 @@ import { Food } from './food.entity';
 @Entity('food_type')
 export class FoodType {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  type: string;
+  type!: string;
 
   @OneToMany(() => Food, (food) => food.type)
-  foods: Food[];
+  foods!: Food[];
 }
