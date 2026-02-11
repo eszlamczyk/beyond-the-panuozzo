@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
     AuthenticationModule,
     AuthorizationModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
