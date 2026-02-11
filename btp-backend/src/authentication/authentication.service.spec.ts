@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from './auth.service';
-import { authConfig } from './auth.config';
-import { GoogleUser } from './google.strategy';
+import { AuthenticationService } from './authentication.service';
+import { authenticationConfig } from './authentication.config';
+import type { GoogleUser } from './google-user.schema';
 
-describe('AuthService', () => {
-  let service: AuthService;
+describe('AuthenticationService', () => {
+  let service: AuthenticationService;
   let signMock: jest.Mock;
 
   const mockConfig = {
@@ -24,18 +25,18 @@ describe('AuthService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthService,
+        AuthenticationService,
         {
           provide: JwtService,
           useValue: {
             sign: (signMock = jest.fn().mockReturnValue('mock-jwt-token')),
           },
         },
-        { provide: authConfig.KEY, useValue: mockConfig },
+        { provide: authenticationConfig.KEY, useValue: mockConfig },
       ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    service = module.get<AuthenticationService>(AuthenticationService);
   });
 
   describe('validateRedirectUri', () => {

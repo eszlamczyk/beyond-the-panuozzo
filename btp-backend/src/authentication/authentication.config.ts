@@ -14,8 +14,8 @@ interface JwtConfig {
   secret: string;
 }
 
-/** Namespaced configuration for the auth module. */
-export interface AuthConfig {
+/** Namespaced configuration for the authentication module. */
+export interface AuthenticationConfig {
   google: GoogleConfig;
   jwt: JwtConfig;
   /** Whitelist of URIs the OAuth flow is allowed to redirect to after login (e.g. `vscode://…`, `http://localhost:3000/callback`). */
@@ -30,9 +30,9 @@ function requireEnv(name: string): string {
   return value;
 }
 
-export const authConfig = registerAs(
-  'auth',
-  (): AuthConfig => ({
+export const authenticationConfig = registerAs(
+  'authentication',
+  (): AuthenticationConfig => ({
     google: {
       clientId: requireEnv('GOOGLE_CLIENT_ID'),
       clientSecret: requireEnv('GOOGLE_CLIENT_SECRET'),

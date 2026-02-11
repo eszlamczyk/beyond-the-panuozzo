@@ -2,15 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { authConfig } from './auth.config';
-
-/** Normalized user profile returned by the Google OAuth strategy. */
-export interface GoogleUser {
-  googleId: string;
-  email: string;
-  displayName: string;
-  photo: string | undefined;
-}
+import { authenticationConfig } from './authentication.config';
+import { GoogleUser } from './google-user.schema';
 
 const REQUIRED_SCOPES = ['email', 'profile'];
 
@@ -20,8 +13,8 @@ const REQUIRED_SCOPES = ['email', 'profile'];
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
-    @Inject(authConfig.KEY)
-    config: ConfigType<typeof authConfig>,
+    @Inject(authenticationConfig.KEY)
+    config: ConfigType<typeof authenticationConfig>,
   ) {
     super({
       clientID: config.google.clientId,

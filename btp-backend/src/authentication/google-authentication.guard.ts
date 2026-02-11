@@ -7,9 +7,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { z } from 'zod';
-import { AuthService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 
-/** Expected query parameters for auth request. */
+/** Expected query parameters for authentication request. */
 const googleAuthQuerySchema = z.object({
   redirect_uri: z.string().min(1),
   state: z.string().optional(),
@@ -17,13 +17,16 @@ const googleAuthQuerySchema = z.object({
 
 /** Google authentication guard */
 @Injectable()
-export class GoogleAuthGuard extends AuthGuard('google') {
-  constructor(@Inject(AuthService) private readonly authService: AuthService) {
+export class GoogleAuthenticationGuard extends AuthGuard('google') {
+  constructor(
+    @Inject(AuthenticationService)
+    private readonly authenticationService: AuthenticationService,
+  ) {
     super();
   }
 
   /** Validates the redirect URI before delegating to Passport's Google strategy. */
-  canActivate(context: ExecutionContext) {
+  override canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
     this.assertValidRedirectUri(request);
     return super.canActivate(context);
@@ -34,7 +37,7 @@ export class GoogleAuthGuard extends AuthGuard('google') {
    * OAuth `state` parameter so they survive the round-trip without requiring
    * server-side sessions.
    */
-  getAuthenticateOptions(context: ExecutionContext) {
+  override getAuthenticateOptions(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
     const { redirect_uri: redirectUri, state: clientState } =
       googleAuthQuerySchema.partial().parse(request.query);
@@ -50,7 +53,11 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     const result = googleAuthQuerySchema.safeParse(request.query);
 
     if (result.success) {
-      if (!this.authService.validateRedirectUri(result.data.redirect_uri)) {
+      if (
+        !this.authenticationService.validateRedirectUri(
+          result.data.redirect_uri,
+        )
+      ) {
         throw new BadRequestException(
           'Invalid redirect_uri. Must be a whitelisted URI.',
         );
