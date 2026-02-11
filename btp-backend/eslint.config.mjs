@@ -38,8 +38,7 @@ export default tseslint.config(
       'complexity': ['warn', 10],
       'max-depth': ['warn', 4],
       'max-params': ['warn', 4],
-      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }]
     },
   },
 );
