@@ -1,6 +1,5 @@
 // @ts-check
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -10,7 +9,6 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
   {
     languageOptions: {
       globals: {
@@ -40,8 +38,7 @@ export default tseslint.config(
       'complexity': ['warn', 10],
       'max-depth': ['warn', 4],
       'max-params': ['warn', 4],
-      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }]
     },
   },
 );
