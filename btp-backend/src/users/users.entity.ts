@@ -1,4 +1,4 @@
-import { Wishlist } from 'src/wishlist/wishlist.entity';
+import { Wishlist } from '../wishlist/wishlist.entity';
 import { Order } from '../orders/order.entity';
 import { UserOrder } from '../orders/user-order.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';

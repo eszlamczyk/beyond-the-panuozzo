@@ -1,6 +1,6 @@
-import { Food } from 'src/foods/food.entity';
-import { Order } from 'src/orders/order.entity';
-import { User } from 'src/users/users.entity';
+import { Food } from '../foods/food.entity';
+import { Order } from '../orders/order.entity';
+import { User } from '../users/users.entity';
 import {
   Check,
   Column,

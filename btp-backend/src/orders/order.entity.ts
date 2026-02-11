@@ -8,7 +8,7 @@ import {
 import { OrderStatus } from './order-status.enum';
 import { User } from '../users/users.entity';
 import { UserOrder } from './user-order.entity';
-import { Wishlist } from 'src/wishlist/wishlist.entity';
+import { Wishlist } from '../wishlist/wishlist.entity';
 
 @Entity('orders')
 export class Order {
