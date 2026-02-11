@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { FoodTypesService } from './food-types.service';
 import { FoodType } from './food-type.entity';
-import { CreateFoodTypeDto } from './dto/create-food-type.dto';
+import type { CreateFoodTypeDto } from './dto/create-food-type.dto';
 
 describe('FoodTypesService', () => {
   let service: FoodTypesService;

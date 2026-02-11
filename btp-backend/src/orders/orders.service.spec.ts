@@ -1,17 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './order.entity';
 import { UserOrder } from './user-order.entity';
-import { CreateOrderDto } from './dto/create-order.dto';
+import type { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus } from './order-status.enum';
 
 describe('OrdersService', () => {
   let service: OrdersService;
   let orderRepository: Partial<Record<keyof Repository<Order>, jest.Mock>>;
-  let userOrderRepository: Partial<Record<keyof Repository<UserOrder>, jest.Mock>>;
+  let userOrderRepository: Partial<
+    Record<keyof Repository<UserOrder>, jest.Mock>
+  >;
 
   const mockOrder = {
     id: 'order-uuid',
@@ -39,7 +42,10 @@ describe('OrdersService', () => {
       providers: [
         OrdersService,
         { provide: getRepositoryToken(Order), useValue: orderRepository },
-        { provide: getRepositoryToken(UserOrder), useValue: userOrderRepository },
+        {
+          provide: getRepositoryToken(UserOrder),
+          useValue: userOrderRepository,
+        },
       ],
     }).compile();
 
@@ -76,7 +82,9 @@ describe('OrdersService', () => {
   describe('addFoodToOrder', () => {
     it('should add an item to an order', async () => {
       const dto = { foodId: 'food-uuid', userId: 'user-uuid' };
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockOrder as any);
+      jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(mockOrder as unknown as Order);
       userOrderRepository.create!.mockReturnValue(mockUserOrder);
       userOrderRepository.save!.mockResolvedValue(mockUserOrder);
 

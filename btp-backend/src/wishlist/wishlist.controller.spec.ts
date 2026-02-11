@@ -1,8 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { WishlistController } from './wishlist.controller';
 import { WishlistService } from './wishlist.service';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import type { CreateWishlistDto } from './dto/create-wishlist.dto';
+import type { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import type { Wishlist } from './wishlist.entity';
 
 const mockWishlistService = {
   create: jest.fn(),
@@ -46,10 +48,12 @@ describe('WishlistController', () => {
         rating: 5,
       };
       const expectedResult = { id: mockWishlistId, ...createDto };
-      jest.spyOn(service, 'create').mockResolvedValue(expectedResult as any);
+      const createSpy = jest
+        .spyOn(service, 'create')
+        .mockResolvedValue(expectedResult as unknown as Wishlist);
 
       const result = await controller.create(createDto);
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(createSpy).toHaveBeenCalledWith(createDto);
       expect(result).toEqual(expectedResult);
     });
   });
@@ -57,12 +61,19 @@ describe('WishlistController', () => {
   describe('findByUser', () => {
     it('should get wishlist items for a user', async () => {
       const expectedResult = [
-        { id: mockWishlistId, userId: mockUserId, foodId: mockFoodId, rating: 5 },
+        {
+          id: mockWishlistId,
+          userId: mockUserId,
+          foodId: mockFoodId,
+          rating: 5,
+        },
       ];
-      jest.spyOn(service, 'findByUser').mockResolvedValue(expectedResult as any);
+      const findSpy = jest
+        .spyOn(service, 'findByUser')
+        .mockResolvedValue(expectedResult as unknown as Wishlist[]);
 
       const result = await controller.findByUser(mockUserId);
-      expect(service.findByUser).toHaveBeenCalledWith(mockUserId);
+      expect(findSpy).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual(expectedResult);
     });
   });
@@ -76,21 +87,23 @@ describe('WishlistController', () => {
         foodId: mockFoodId,
         rating: 4,
       };
-      jest
+      const updateSpy = jest
         .spyOn(service, 'updateRating')
-        .mockResolvedValue(expectedResult as any);
+        .mockResolvedValue(expectedResult as unknown as Wishlist);
 
       const result = await controller.update(mockWishlistId, updateDto);
-      expect(service.updateRating).toHaveBeenCalledWith(mockWishlistId, updateDto);
+      expect(updateSpy).toHaveBeenCalledWith(mockWishlistId, updateDto);
       expect(result).toEqual(expectedResult);
     });
   });
 
   describe('remove', () => {
     it('should remove a wishlist item', async () => {
-      jest.spyOn(service, 'remove').mockResolvedValue(undefined);
+      const removeSpy = jest
+        .spyOn(service, 'remove')
+        .mockResolvedValue(undefined);
       const result = await controller.remove(mockWishlistId);
-      expect(service.remove).toHaveBeenCalledWith(mockWishlistId);
+      expect(removeSpy).toHaveBeenCalledWith(mockWishlistId);
       expect(result).toBeUndefined();
     });
   });

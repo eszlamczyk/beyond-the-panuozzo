@@ -33,7 +33,10 @@ export class FoodTypesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFoodTypeDto: UpdateFoodTypeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateFoodTypeDto: UpdateFoodTypeDto,
+  ) {
     return this.foodTypesService.update(id, updateFoodTypeDto);
   }
 

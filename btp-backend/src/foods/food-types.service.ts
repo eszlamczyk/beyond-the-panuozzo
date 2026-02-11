@@ -29,7 +29,10 @@ export class FoodTypesService {
     return foodType;
   }
 
-  async update(id: string, updateFoodTypeDto: UpdateFoodTypeDto): Promise<FoodType> {
+  async update(
+    id: string,
+    updateFoodTypeDto: UpdateFoodTypeDto,
+  ): Promise<FoodType> {
     const foodType = await this.foodTypesRepository.preload({
       id,
       ...updateFoodTypeDto,

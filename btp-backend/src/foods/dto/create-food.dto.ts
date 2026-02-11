@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsPositive, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsPositive,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateFoodDto {
   @ApiProperty({ example: 'Margherita' })
@@ -7,7 +13,10 @@ export class CreateFoodDto {
   @IsNotEmpty()
   name!: string;
 
-  @ApiProperty({ description: 'Price in grosze (e.g., 2500 for 25.00 PLN)', example: 2500 })
+  @ApiProperty({
+    description: 'Price in grosze (e.g., 2500 for 25.00 PLN)',
+    example: 2500,
+  })
   @IsInt()
   @IsPositive()
   price!: number;

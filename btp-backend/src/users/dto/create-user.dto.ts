@@ -17,6 +17,8 @@ export class CreateUserDto {
   email!: string;
 
   @ApiProperty({ example: '+15551234567' })
-  @IsPhoneNumber(undefined, { message: 'Phone number must be a valid phone number.' })
+  @IsPhoneNumber(undefined, {
+    message: 'Phone number must be a valid phone number.',
+  })
   phoneNumber!: string;
 }

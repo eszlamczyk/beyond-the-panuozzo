@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { FoodsService } from './foods.service';
 import { Food } from './food.entity';
-import { CreateFoodDto } from './dto/create-food.dto';
+import type { CreateFoodDto } from './dto/create-food.dto';
 
 describe('FoodsService', () => {
   let service: FoodsService;
@@ -108,7 +109,7 @@ describe('FoodsService', () => {
       expect(repository.delete).toHaveBeenCalledWith('uuid');
     });
 
-it('should throw NotFoundException on remove', async () => {
+    it('should throw NotFoundException on remove', async () => {
       repository.delete!.mockResolvedValue({ affected: 0 });
       await expect(service.remove('uuid')).rejects.toThrow(NotFoundException);
     });

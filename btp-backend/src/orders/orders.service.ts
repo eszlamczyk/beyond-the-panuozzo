@@ -40,7 +40,10 @@ export class OrdersService {
     return order;
   }
 
-  async updateStatus(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
+  async updateStatus(
+    id: string,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
     const order = await this.ordersRepository.preload({
       id,
       status: updateOrderDto.status,
@@ -74,7 +77,9 @@ export class OrdersService {
   async removeFoodFromOrder(itemId: string): Promise<void> {
     const result = await this.userOrdersRepository.delete(itemId);
     if (result.affected === 0) {
-      throw new NotFoundException(`UserOrder item with ID "${itemId}" not found`);
+      throw new NotFoundException(
+        `UserOrder item with ID "${itemId}" not found`,
+      );
     }
   }
 }
