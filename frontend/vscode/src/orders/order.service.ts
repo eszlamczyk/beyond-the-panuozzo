@@ -31,9 +31,7 @@ export class OrderService implements vscode.Disposable {
         this._onDidChange.fire();
       }),
       auth.onDidChangeSession(async () => {
-        const session = await this.auth.getSession();
-        this.userId = session?.sub;
-        this._onDidChange.fire();
+        await this.initialize();
       })
     );
   }
@@ -69,18 +67,18 @@ export class OrderService implements vscode.Disposable {
 
   /** Extracts the current user's wishlist from the cached order. */
   getMyWishlist(): WishlistItem[] {
-    const me = this.order?.participants.find(
-      (p) => p.userId === this.userId
-    );
+    const order = this.getOrder();
+    const me = order?.participants.find((p) => p.userId === this.userId);
     return me?.wishlist ?? [];
   }
 
   /** Returns participants other than the current user. */
   getOtherParticipants(): Participant[] {
-    if (!this.order) {
+    const order = this.getOrder();
+    if (!order || !this.userId) {
       return [];
     }
-    return this.order.participants.filter((p) => p.userId !== this.userId);
+    return order.participants.filter((p) => p.userId !== this.userId);
   }
 
   async getMenu(): Promise<MenuItem[]> {
@@ -89,17 +87,19 @@ export class OrderService implements vscode.Disposable {
 
   /** Adds a wishlist item, silently no-ops if the order isn't in draft state. */
   async addItem(item: WishlistItem): Promise<void> {
-    if (!this.order || this.order.status !== "draft") {
+    const order = this.getOrder();
+    if (!order || order.status !== "draft") {
       return;
     }
-    await this.client.addWishlistItem(this.order.id, item);
+    await this.client.addWishlistItem(order.id, item);
   }
 
   /** Removes a wishlist item, silently no-ops if the order isn't in draft state. */
   async removeItem(menuItemId: string): Promise<void> {
-    if (!this.order || this.order.status !== "draft") {
+    const order = this.getOrder();
+    if (!order || order.status !== "draft") {
       return;
     }
-    await this.client.removeWishlistItem(this.order.id, menuItemId);
+    await this.client.removeWishlistItem(order.id, menuItemId);
   }
 }
