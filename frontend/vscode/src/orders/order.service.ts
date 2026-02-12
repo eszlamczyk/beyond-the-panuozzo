@@ -30,8 +30,9 @@ export class OrderService implements vscode.Disposable {
         this.order = event.order;
         this._onDidChange.fire();
       }),
-      auth.onDidChangeSession(() => {
-        this.userId = undefined;
+      auth.onDidChangeSession(async () => {
+        const session = await this.auth.getSession();
+        this.userId = session?.sub;
         this._onDidChange.fire();
       })
     );
