@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const accountTree = new AccountTreeDataProvider(auth);
 
   // Order system
-  const orderClient = new MockOrderClient();
+  const orderClient = new MockOrderClient(() => auth.getUserId());
   const orderService = new OrderService(orderClient, auth);
   const orderTree = new OrderTreeDataProvider(orderService);
 

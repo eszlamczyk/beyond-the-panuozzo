@@ -115,7 +115,7 @@ export class OrderTreeDataProvider
       case "my-wishlist-header":
         return this.getMyWishlistChildren();
       case "participants-header":
-        return this.getParticipantNodes(order);
+        return this.getParticipantNodes();
       case "participant":
         return element.items.map((item) => ({
           kind: "participant-item" as const,
@@ -147,9 +147,7 @@ export class OrderTreeDataProvider
       return [{ kind: "finalized-header" }];
     }
 
-    const others = order.participants.filter(
-      (p) => p.userId !== "current-user"
-    );
+    const others = this.orderService.getOtherParticipants();
 
     return [
       { kind: "my-wishlist-header" },
@@ -169,14 +167,12 @@ export class OrderTreeDataProvider
   }
 
   /** Lists other participants (excluding the current user) so the user can browse their picks. */
-  private getParticipantNodes(order: Order): TreeNode[] {
-    return order.participants
-      .filter((p) => p.userId !== "current-user")
-      .map((p) => ({
-        kind: "participant" as const,
-        name: p.name,
-        items: p.wishlist,
-      }));
+  private getParticipantNodes(): TreeNode[] {
+    return this.orderService.getOtherParticipants().map((p) => ({
+      kind: "participant" as const,
+      name: p.name,
+      items: p.wishlist,
+    }));
   }
 
   /** Flattens the finalized order into display-ready lines with joined assignee names. */

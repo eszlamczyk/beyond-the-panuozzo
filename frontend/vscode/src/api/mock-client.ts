@@ -20,12 +20,10 @@ const MOCK_MENU: MenuItem[] = [
   { id: "capricciosa-half", name: "Capricciosa", isHalf: true },
 ];
 
-const CURRENT_USER_ID = "current-user";
-
-function buildMockParticipants(): Participant[] {
+function buildMockParticipants(currentUserId: string): Participant[] {
   return [
     {
-      userId: CURRENT_USER_ID,
+      userId: currentUserId,
       name: "You",
       wishlist: [],
     },
@@ -100,8 +98,10 @@ export class MockOrderClient implements IOrderClient {
   private readonly listeners: ((event: OrderEvent) => void)[] = [];
   private order: Order | undefined;
   private readonly timers: ReturnType<typeof setTimeout>[] = [];
+  private readonly resolveUserId: () => string;
 
-  constructor() {
+  constructor(resolveUserId: () => string) {
+    this.resolveUserId = resolveUserId;
     this.scheduleNewOrder();
   }
 
@@ -129,7 +129,7 @@ export class MockOrderClient implements IOrderClient {
       return;
     }
 
-    const me = this.order.participants.find((p) => p.userId === CURRENT_USER_ID);
+    const me = this.order.participants.find((p) => p.userId === this.resolveUserId());
     if (!me) {
       return;
     }
@@ -144,7 +144,7 @@ export class MockOrderClient implements IOrderClient {
       return;
     }
 
-    const me = this.order.participants.find((p) => p.userId === CURRENT_USER_ID);
+    const me = this.order.participants.find((p) => p.userId === this.resolveUserId());
     if (!me) {
       return;
     }
@@ -166,7 +166,7 @@ export class MockOrderClient implements IOrderClient {
         status: "draft",
         createdAt: new Date(),
         menu: [...MOCK_MENU],
-        participants: buildMockParticipants(),
+        participants: buildMockParticipants(this.resolveUserId()),
       };
       this.emit({ type: "created", order: this.order });
       this.scheduleFinalizeOrder();

@@ -1,9 +1,7 @@
 import * as vscode from "vscode";
 import { AuthService } from "../auth";
 import { IOrderClient } from "../api/client";
-import { MenuItem, Order, WishlistItem } from "../types";
-
-const CURRENT_USER_ID = "current-user";
+import { MenuItem, Order, Participant, WishlistItem } from "../types";
 
 /**
  * Mediator between the backend order API and the VS Code UI layer.
@@ -20,6 +18,7 @@ export class OrderService implements vscode.Disposable {
   readonly onDidChange = this._onDidChange.event;
 
   private order: Order | undefined;
+  private userId: string | undefined;
   private readonly disposables: vscode.Disposable[] = [];
 
   constructor(
@@ -32,6 +31,7 @@ export class OrderService implements vscode.Disposable {
     });
     this.disposables.push(
       auth.onDidChangeSession(() => {
+        this.userId = undefined;
         this._onDidChange.fire();
       })
     );
@@ -44,8 +44,13 @@ export class OrderService implements vscode.Disposable {
     this._onDidChange.dispose();
   }
 
-  /** Fetches the active order from the backend and seeds the local cache. */
+  /**
+   * Fetches the active order from the backend and caches the authenticated
+   * user's ID from the JWT `sub` claim so participant lookups stay synchronous.
+   */
   async initialize(): Promise<void> {
+    const session = await this.auth.getSession();
+    this.userId = session?.sub;
     this.order = await this.client.getActiveOrder();
     this._onDidChange.fire();
   }
@@ -59,15 +64,24 @@ export class OrderService implements vscode.Disposable {
     if (!session) {
       return undefined;
     }
+    this.userId = session.sub;
     return this.order;
   }
 
   /** Extracts the current user's wishlist from the cached order. */
   getMyWishlist(): WishlistItem[] {
     const me = this.order?.participants.find(
-      (p) => p.userId === CURRENT_USER_ID
+      (p) => p.userId === this.userId
     );
     return me?.wishlist ?? [];
+  }
+
+  /** Returns participants other than the current user. */
+  getOtherParticipants(): Participant[] {
+    if (!this.order) {
+      return [];
+    }
+    return this.order.participants.filter((p) => p.userId !== this.userId);
   }
 
   async getMenu(): Promise<MenuItem[]> {
