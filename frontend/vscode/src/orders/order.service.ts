@@ -16,11 +16,11 @@ export class OrderService implements vscode.Disposable {
     private readonly client: IOrderClient,
     private readonly auth: AuthService,
   ) {
+    client.onOrderEvent((event) => {
+      this.order = event.order;
+      this._onDidChange.fire();
+    });
     this.disposables.push(
-      client.onOrderEvent((event) => {
-        this.order = event.order;
-        this._onDidChange.fire();
-      }),
       auth.onDidChangeSession(() => {
         this._onDidChange.fire();
       })

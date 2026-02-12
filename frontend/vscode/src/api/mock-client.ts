@@ -1,10 +1,9 @@
 /**
- * Mocked btp-backend client. Simulates server responses. 
- * 
+ * Mocked btp-backend client. Simulates server responses.
+ *
  * To be replaced with real client when the backend is implemented.
  */
 
-import * as vscode from "vscode";
 import { IOrderClient, OrderEvent } from "./client";
 import { FinalizedOrder, MenuItem, Order, Participant, WishlistItem } from "../types";
 
@@ -98,9 +97,7 @@ const NEW_ORDER_DELAY_MS = 5_000;
 const FINALIZE_DELAY_MS = 60_000;
 
 export class MockOrderClient implements IOrderClient {
-  private readonly _onOrderEvent = new vscode.EventEmitter<OrderEvent>();
-  readonly onOrderEvent = this._onOrderEvent.event;
-
+  private readonly listeners: ((event: OrderEvent) => void)[] = [];
   private order: Order | undefined;
   private readonly timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -108,11 +105,15 @@ export class MockOrderClient implements IOrderClient {
     this.scheduleNewOrder();
   }
 
+  onOrderEvent(listener: (event: OrderEvent) => void): void {
+    this.listeners.push(listener);
+  }
+
   dispose(): void {
     for (const t of this.timers) {
       clearTimeout(t);
     }
-    this._onOrderEvent.dispose();
+    this.listeners.length = 0;
   }
 
   async getActiveOrder(): Promise<Order | undefined> {
@@ -135,7 +136,7 @@ export class MockOrderClient implements IOrderClient {
 
     me.wishlist.push({ ...item });
 
-    this._onOrderEvent.fire({ type: "updated", order: this.order });
+    this.emit({ type: "updated", order: this.order });
   }
 
   async removeWishlistItem(orderId: string, menuItemId: string): Promise<void> {
@@ -149,7 +150,13 @@ export class MockOrderClient implements IOrderClient {
     }
 
     me.wishlist = me.wishlist.filter((w) => w.menuItem.id !== menuItemId);
-    this._onOrderEvent.fire({ type: "updated", order: this.order });
+    this.emit({ type: "updated", order: this.order });
+  }
+
+  private emit(event: OrderEvent): void {
+    for (const l of this.listeners) {
+      l(event);
+    }
   }
 
   private scheduleNewOrder(): void {
@@ -161,7 +168,7 @@ export class MockOrderClient implements IOrderClient {
         menu: [...MOCK_MENU],
         participants: buildMockParticipants(),
       };
-      this._onOrderEvent.fire({ type: "created", order: this.order });
+      this.emit({ type: "created", order: this.order });
       this.scheduleFinalizeOrder();
     }, NEW_ORDER_DELAY_MS);
     this.timers.push(t);
@@ -174,7 +181,7 @@ export class MockOrderClient implements IOrderClient {
       }
       this.order.status = "finalized";
       this.order.finalizedOrder = buildFinalizedOrder(this.order.participants);
-      this._onOrderEvent.fire({ type: "finalized", order: this.order });
+      this.emit({ type: "finalized", order: this.order });
     }, FINALIZE_DELAY_MS);
     this.timers.push(t);
   }

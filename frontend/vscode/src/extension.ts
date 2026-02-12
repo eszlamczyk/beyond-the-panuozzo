@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext): void {
   updateAuthContext();
 
   // Notifications
-  showOrderNotifications(context, orderClient);
+  showOrderNotifications(orderClient);
 
   // Register tree views
   context.subscriptions.push(
@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
       treeDataProvider: accountTree,
     }),
     auth,
-    orderClient,
+    { dispose: () => orderClient.dispose() },
     orderService
   );
 
@@ -76,23 +76,18 @@ function registerAuthCommands(
   );
 }
 
-function showOrderNotifications(
-  context: vscode.ExtensionContext,
-  orderClient: MockOrderClient
-) {
-  context.subscriptions.push(
-    orderClient.onOrderEvent((event) => {
-      if (event.type === "created") {
-        vscode.window.showInformationMessage(
-          `New panuozzo order! Add your wishlist items.`
-        );
-      } else if (event.type === "finalized") {
-        vscode.window.showInformationMessage(
-          `Order #${event.order.id} has been finalized! Check the sidebar for results.`
-        );
-      }
-    })
-  );
+function showOrderNotifications(orderClient: MockOrderClient) {
+  orderClient.onOrderEvent((event) => {
+    if (event.type === "created") {
+      vscode.window.showInformationMessage(
+        `New panuozzo order! Add your wishlist items.`
+      );
+    } else if (event.type === "finalized") {
+      vscode.window.showInformationMessage(
+        `Order #${event.order.id} has been finalized! Check the sidebar for results.`
+      );
+    }
+  });
 }
 
 /** Called by VS Code when the extension is deactivated. Currently a no-op. */
