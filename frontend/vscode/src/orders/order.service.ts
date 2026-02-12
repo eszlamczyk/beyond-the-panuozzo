@@ -28,6 +28,7 @@ export class OrderService implements vscode.Disposable {
     this.disposables.push(
       client.onOrderEvent((event) => {
         this.order = event.order;
+        this.updateHasDraftOrderContext();
         this._onDidChange.fire();
       }),
       auth.onDidChangeSession(async () => {
@@ -43,6 +44,15 @@ export class OrderService implements vscode.Disposable {
     this._onDidChange.dispose();
   }
 
+  private updateHasDraftOrderContext(): void {
+    const order = this.getOrder();
+    vscode.commands.executeCommand(
+      "setContext",
+      "btp.hasDraftOrder",
+      order?.status === "draft",
+    );
+  }
+
   /**
    * Fetches the active order from the backend and caches the authenticated
    * user's ID from the JWT `sub` claim so participant lookups stay synchronous.
@@ -51,6 +61,7 @@ export class OrderService implements vscode.Disposable {
     const session = await this.auth.getSession();
     this.userId = session?.sub;
     this.order = await this.client.getActiveOrder();
+    this.updateHasDraftOrderContext();
     this._onDidChange.fire();
   }
 

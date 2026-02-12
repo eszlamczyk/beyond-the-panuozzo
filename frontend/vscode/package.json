@@ -67,14 +67,14 @@
       "view/title": [
         {
           "command": "btp.addWishlistItem",
-          "when": "view == btp-explorer",
+          "when": "view == btp-explorer && btp.hasDraftOrder",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "btp.removeWishlistItem",
-          "when": "view == btp-explorer && viewItem == wishlistItem",
+          "when": "view == btp-explorer && viewItem == wishlistItem && btp.hasDraftOrder",
           "group": "inline"
         }
       ]

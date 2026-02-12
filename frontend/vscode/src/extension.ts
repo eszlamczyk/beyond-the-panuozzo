@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { AuthService } from "./auth";
 import { AccountTreeDataProvider } from "./account-tree-provider";
+import type { IOrderClient } from "./api/client";
 import { MockOrderClient } from "./api/mock-client";
 import { OrderService } from "./orders/order.service";
 import { OrderTreeDataProvider } from "./orders/order-tree-provider";
@@ -50,6 +51,8 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.createTreeView(Views.Account, {
       treeDataProvider: accountTree,
     }),
+    accountTree,
+    orderTree,
     auth,
     { dispose: () => orderClient.dispose() },
     orderService
@@ -76,7 +79,7 @@ function registerAuthCommands(
   );
 }
 
-function showOrderNotifications(orderClient: MockOrderClient) {
+function showOrderNotifications(orderClient: IOrderClient) {
   return orderClient.onOrderEvent((event) => {
     if (event.type === "created") {
       vscode.window.showInformationMessage(

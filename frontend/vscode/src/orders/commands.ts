@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { OrderService } from "./order.service";
 import { Commands } from "../constants";
-import { DesireLevel, MenuItem } from "../types";
+import { DesireLevel } from "../types";
 
 /**
  * Wires up all order-related VS Code commands so the rest of the extension
@@ -86,7 +86,7 @@ async function addWishlistItem(orderService: OrderService): Promise<void> {
   }
 
   await orderService.addItem({
-    menuItem: picked.menuItem as MenuItem,
+    menuItem: picked.menuItem,
     desireLevel: desirePick.level,
   });
 }

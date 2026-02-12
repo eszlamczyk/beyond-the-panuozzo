@@ -36,12 +36,16 @@ type TreeNode =
  * Visible only when signed in (gated by the `btp.signedIn` context key).
  */
 export class OrderTreeDataProvider
-  implements vscode.TreeDataProvider<TreeNode>
+  implements vscode.TreeDataProvider<TreeNode>, vscode.Disposable
 {
   private readonly _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   constructor(private readonly orderService: OrderService) {}
+
+  dispose(): void {
+    this._onDidChangeTreeData.dispose();
+  }
 
   /** Signals VS Code to re-fetch the entire tree (e.g. after a wishlist mutation). */
   refresh(): void {
@@ -55,7 +59,7 @@ export class OrderTreeDataProvider
         return treeItem("No active order", { icon: "package" });
 
       case "order-header": {
-        const status = node.order.status === "draft" ? "Draft" : "Finalized";
+        const status = node.order.status.charAt(0).toUpperCase() + node.order.status.slice(1);
         return treeItem(`Order #${node.order.id} (${status})`, {
           icon: "package",
           state: Expanded,
@@ -84,7 +88,7 @@ export class OrderTreeDataProvider
         return treeItem(node.name, {
           icon: "person",
           state: node.items.length > 0 ? Collapsed : None,
-          description: `${node.items.length} item(s)`,
+          description: node.items.length === 1 ? "1 item" : `${node.items.length} items`,
         });
 
       case "participant-item":

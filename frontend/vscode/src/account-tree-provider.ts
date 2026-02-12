@@ -25,12 +25,16 @@ type AccountNode =
  * to re-render after sign-in or sign-out.
  */
 export class AccountTreeDataProvider
-  implements vscode.TreeDataProvider<AccountNode>
+  implements vscode.TreeDataProvider<AccountNode>, vscode.Disposable
 {
   private readonly _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   constructor(private readonly auth: AuthService) {}
+
+  dispose(): void {
+    this._onDidChangeTreeData.dispose();
+  }
 
   /** Fires the change event so VS Code re-renders the tree. */
   refresh(): void {
