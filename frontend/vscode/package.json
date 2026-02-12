@@ -30,7 +30,12 @@
       "btp-sidebar": [
         {
           "id": "btp-explorer",
-          "name": "Explorer"
+          "name": "Orders",
+          "when": "btp.signedIn"
+        },
+        {
+          "id": "btp-account",
+          "name": "Account"
         }
       ]
     },
@@ -44,8 +49,36 @@
         "command": "btp.signOut",
         "title": "Sign Out",
         "category": "Beyond the Panuozzo"
+      },
+      {
+        "command": "btp.addWishlistItem",
+        "title": "Add Item to Wishlist",
+        "category": "Beyond the Panuozzo",
+        "icon": "$(add)"
+      },
+      {
+        "command": "btp.removeWishlistItem",
+        "title": "Remove from Wishlist",
+        "category": "Beyond the Panuozzo",
+        "icon": "$(trash)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "btp.addWishlistItem",
+          "when": "view == btp-explorer && btp.hasDraftOrder",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "btp.removeWishlistItem",
+          "when": "view == btp-explorer && viewItem == wishlistItem && btp.hasDraftOrder",
+          "group": "inline"
+        }
+      ]
+    },
     "configuration": {
       "title": "Beyond the Panuozzo"
     }

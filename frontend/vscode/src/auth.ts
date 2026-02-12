@@ -104,6 +104,11 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     return payload;
   }
 
+  /** Returns the cached user ID (`sub` claim) synchronously, or `""` if not signed in. */
+  getUserId(): string {
+    return this.cachedPayload?.sub ?? "";
+  }
+
   /** Returns the raw JWT string if a valid session exists, otherwise `undefined`. */
   async getToken(): Promise<string | undefined> {
     const session = await this.getSession();

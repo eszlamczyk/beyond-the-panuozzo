@@ -2,11 +2,14 @@
 export const Commands = {
   SignIn: "btp.signIn",
   SignOut: "btp.signOut",
+  AddWishlistItem: "btp.addWishlistItem",
+  RemoveWishlistItem: "btp.removeWishlistItem",
 } as const;
 
 /** View / container identifiers – must match `contributes.views` in package.json. */
 export const Views = {
   Explorer: "btp-explorer",
+  Account: "btp-account",
 } as const;
 
 /** Backend server URLs per environment. */
