@@ -164,8 +164,8 @@ export class MockOrderClient implements IOrderClient {
   private emit(event: OrderEvent): void {
     if (!this.resolveUserId()) {
       return;
-    }
-    for (const l of this.listeners) {
+  private emit(event: OrderEvent): void {
+    for (const l of [...this.listeners]) {
       l(event);
     }
   }
