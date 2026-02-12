@@ -3,6 +3,13 @@ import { OrderService } from "./order.service";
 import { Commands } from "../constants";
 import { DesireLevel, MenuItem } from "../types";
 
+/**
+ * Wires up all order-related VS Code commands so the rest of the extension
+ * can trigger them by identifier without knowing the implementation details.
+ *
+ * Commands are registered on the extension context so they are automatically
+ * disposed when the extension deactivates.
+ */
 export function registerOrderCommands(
   context: vscode.ExtensionContext,
   orderService: OrderService
@@ -20,6 +27,18 @@ export function registerOrderCommands(
   );
 }
 
+/**
+ * Guides the user through picking a menu item and a desire level, then adds
+ * the selection to their wishlist.
+ *
+ * The two-step QuickPick flow (item → desire) exists because an order is
+ * collaborative: participants express *preferences*, not hard commitments.
+ * The desire rating lets the finalizer prioritize items that people actually
+ * care about over ones added "just in case."
+ *
+ * Only draft orders accept new items — once an order is finalized the
+ * selections are locked and this command bails out early.
+ */
 async function addWishlistItem(orderService: OrderService): Promise<void> {
   const order = await orderService.getOrder();
   if (!order || order.status !== "draft") {
@@ -68,6 +87,7 @@ async function addWishlistItem(orderService: OrderService): Promise<void> {
   });
 }
 
+/** Removes an item from the user's wishlist. */
 async function removeWishlistItem(
   orderService: OrderService,
   menuItemId: string
