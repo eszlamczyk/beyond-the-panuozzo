@@ -1,3 +1,4 @@
+import { Wishlist } from '../wishlist/wishlist.entity';
 import { Order } from '../orders/order.entity';
 import { UserOrder } from '../orders/user-order.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -24,4 +25,7 @@ export class User {
 
   @OneToMany(() => UserOrder, (userOrder) => userOrder.user)
   items!: UserOrder[];
+
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.user)
+  wishlists!: Wishlist[];
 }
