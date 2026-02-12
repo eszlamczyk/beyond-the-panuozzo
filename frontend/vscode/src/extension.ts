@@ -1,12 +1,12 @@
-import * as vscode from "vscode";
-import { AuthService } from "./auth";
-import { AccountTreeDataProvider } from "./account-tree-provider";
-import type { IOrderClient } from "./api/client";
-import { MockOrderClient } from "./api/mock-client";
-import { OrderService } from "./orders/order.service";
-import { OrderTreeDataProvider } from "./orders/order-tree-provider";
-import { registerOrderCommands } from "./orders/commands";
-import { Commands, Views } from "./constants";
+import * as vscode from 'vscode';
+import { AuthService } from './auth';
+import { AccountTreeDataProvider } from './account-tree-provider';
+import type { IOrderClient } from './api/client';
+import { MockOrderClient } from './api/mock-client';
+import { OrderService } from './orders/order.service';
+import { OrderTreeDataProvider } from './orders/order-tree-provider';
+import { registerOrderCommands } from './orders/commands';
+import { Commands, Views } from './constants';
 
 /** Called by VS Code when the extension is activated. */
 export function activate(context: vscode.ExtensionContext): void {
@@ -29,16 +29,18 @@ export function activate(context: vscode.ExtensionContext): void {
   const updateAuthContext = async () => {
     const session = await auth.getSession();
     await vscode.commands.executeCommand(
-      "setContext", "btp.signedIn", !!session
+      'setContext',
+      'btp.signedIn',
+      !!session,
     );
     accountTree.refresh();
     orderTree.refresh();
   };
   context.subscriptions.push(
     auth.onDidChangeSession(() => updateAuthContext()),
-    orderService.onDidChange(() => orderTree.refresh())
+    orderService.onDidChange(() => orderTree.refresh()),
   );
-  updateAuthContext();
+  void updateAuthContext();
 
   // Notifications
   context.subscriptions.push(showOrderNotifications(orderClient));
@@ -55,39 +57,39 @@ export function activate(context: vscode.ExtensionContext): void {
     orderTree,
     auth,
     { dispose: () => orderClient.dispose() },
-    orderService
+    orderService,
   );
 
   // Load initial order state
-  orderService.initialize();
+  void orderService.initialize();
 }
 
 function registerOAuthHandler(
   context: vscode.ExtensionContext,
-  auth: AuthService
+  auth: AuthService,
 ) {
   context.subscriptions.push(vscode.window.registerUriHandler(auth));
 }
 
 function registerAuthCommands(
   context: vscode.ExtensionContext,
-  auth: AuthService
+  auth: AuthService,
 ) {
   context.subscriptions.push(
     vscode.commands.registerCommand(Commands.SignIn, () => auth.signIn()),
-    vscode.commands.registerCommand(Commands.SignOut, () => auth.signOut())
+    vscode.commands.registerCommand(Commands.SignOut, () => auth.signOut()),
   );
 }
 
 function showOrderNotifications(orderClient: IOrderClient) {
   return orderClient.onOrderEvent((event) => {
-    if (event.type === "created") {
+    if (event.type === 'created') {
       vscode.window.showInformationMessage(
-        `New panuozzo order! Add your wishlist items.`
+        `New panuozzo order! Add your wishlist items.`,
       );
-    } else if (event.type === "finalized") {
+    } else if (event.type === 'finalized') {
       vscode.window.showInformationMessage(
-        `Order #${event.order.id} has been finalized! Check the sidebar for results.`
+        `Order #${event.order.id} has been finalized! Check the sidebar for results.`,
       );
     }
   });

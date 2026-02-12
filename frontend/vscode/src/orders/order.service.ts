@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
-import { AuthService } from "../auth";
-import { IOrderClient } from "../api/client";
-import { MenuItem, Order, Participant, WishlistItem } from "../types";
+import * as vscode from 'vscode';
+import type { AuthService } from '../auth';
+import type { IOrderClient } from '../api/client';
+import type { MenuItem, Order, Participant, WishlistItem } from '../types';
 
 /**
  * Mediator between the backend order API and the VS Code UI layer.
@@ -33,7 +33,7 @@ export class OrderService implements vscode.Disposable {
       }),
       auth.onDidChangeSession(async () => {
         await this.initialize();
-      })
+      }),
     );
   }
 
@@ -47,9 +47,9 @@ export class OrderService implements vscode.Disposable {
   private updateHasDraftOrderContext(): void {
     const order = this.getOrder();
     vscode.commands.executeCommand(
-      "setContext",
-      "btp.hasDraftOrder",
-      order?.status === "draft",
+      'setContext',
+      'btp.hasDraftOrder',
+      order?.status === 'draft',
     );
   }
 
@@ -99,7 +99,7 @@ export class OrderService implements vscode.Disposable {
   /** Adds a wishlist item, silently no-ops if the order isn't in draft state. */
   async addItem(item: WishlistItem): Promise<void> {
     const order = this.getOrder();
-    if (!order || order.status !== "draft") {
+    if (!order || order.status !== 'draft') {
       return;
     }
     await this.client.addWishlistItem(order.id, item);
@@ -108,7 +108,7 @@ export class OrderService implements vscode.Disposable {
   /** Removes a wishlist item, silently no-ops if the order isn't in draft state. */
   async removeItem(menuItemId: string): Promise<void> {
     const order = this.getOrder();
-    if (!order || order.status !== "draft") {
+    if (!order || order.status !== 'draft') {
       return;
     }
     await this.client.removeWishlistItem(order.id, menuItemId);

@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
-import { OrderService } from "./order.service";
-import { Commands } from "../constants";
-import { DesireLevel, MenuItem, Order, WishlistItem } from "../types";
+import * as vscode from 'vscode';
+import type { OrderService } from './order.service';
+import { Commands } from '../constants';
+import type { DesireLevel, MenuItem, Order, WishlistItem } from '../types';
 
 /**
  * Discriminated union of every node type the tree can contain.
@@ -11,16 +11,16 @@ import { DesireLevel, MenuItem, Order, WishlistItem } from "../types";
  * it easy to add new node kinds without touching unrelated code.
  */
 type TreeNode =
-  | { kind: "order-header"; order: Order }
-  | { kind: "my-wishlist-header" }
-  | { kind: "my-wishlist-item"; item: WishlistItem }
-  | { kind: "add-item" }
-  | { kind: "participants-header"; count: number }
-  | { kind: "participant"; name: string; items: WishlistItem[] }
-  | { kind: "participant-item"; item: WishlistItem }
-  | { kind: "finalized-header" }
-  | { kind: "finalized-line"; menuName: string; assignedTo: string }
-  | { kind: "no-order" };
+  | { kind: 'order-header'; order: Order }
+  | { kind: 'my-wishlist-header' }
+  | { kind: 'my-wishlist-item'; item: WishlistItem }
+  | { kind: 'add-item' }
+  | { kind: 'participants-header'; count: number }
+  | { kind: 'participant'; name: string; items: WishlistItem[] }
+  | { kind: 'participant-item'; item: WishlistItem }
+  | { kind: 'finalized-header' }
+  | { kind: 'finalized-line'; menuName: string; assignedTo: string }
+  | { kind: 'no-order' };
 
 /**
  * Drives the sidebar tree view that surfaces the current order state.
@@ -53,56 +53,71 @@ export class OrderTreeDataProvider
   }
 
   /** Maps each node kind to its visual representation (label, icon, collapsibility). */
+  // eslint-disable-next-line complexity
   getTreeItem(node: TreeNode): vscode.TreeItem {
     switch (node.kind) {
-      case "no-order":
-        return treeItem("No active order", { icon: "package" });
+      case 'no-order':
+        return treeItem('No active order', { icon: 'package' });
 
-      case "order-header": {
-        const status = node.order.status.charAt(0).toUpperCase() + node.order.status.slice(1);
+      case 'order-header': {
+        const status =
+          node.order.status.charAt(0).toUpperCase() +
+          node.order.status.slice(1);
         return treeItem(`Order #${node.order.id} (${status})`, {
-          icon: "package",
+          icon: 'package',
           state: Expanded,
         });
       }
 
-      case "my-wishlist-header":
-        return treeItem("My Wishlist", { icon: "checklist", state: Expanded });
+      case 'my-wishlist-header':
+        return treeItem('My Wishlist', { icon: 'checklist', state: Expanded });
 
-      case "my-wishlist-item":
-        return buildWishlistTreeItem(node.item, "circle-filled", "wishlistItem");
+      case 'my-wishlist-item':
+        return buildWishlistTreeItem(
+          node.item,
+          'circle-filled',
+          'wishlistItem',
+        );
 
-      case "add-item":
-        return treeItem("Add item...", {
-          icon: "add",
-          command: { command: Commands.AddWishlistItem, title: "Add item to wishlist" },
+      case 'add-item':
+        return treeItem('Add item...', {
+          icon: 'add',
+          command: {
+            command: Commands.AddWishlistItem,
+            title: 'Add item to wishlist',
+          },
         });
 
-      case "participants-header":
+      case 'participants-header':
         return treeItem(`Participants (${node.count})`, {
-          icon: "organization",
+          icon: 'organization',
           state: Collapsed,
         });
 
-      case "participant":
+      case 'participant':
         return treeItem(node.name, {
-          icon: "person",
+          icon: 'person',
           state: node.items.length > 0 ? Collapsed : None,
-          description: node.items.length === 1 ? "1 item" : `${node.items.length} items`,
+          description:
+            node.items.length === 1 ? '1 item' : `${node.items.length} items`,
         });
 
-      case "participant-item":
-        return buildWishlistTreeItem(node.item, "circle-outline");
+      case 'participant-item':
+        return buildWishlistTreeItem(node.item, 'circle-outline');
 
-      case "finalized-header":
-        return treeItem("Final Order", { icon: "tasklist", state: Expanded });
+      case 'finalized-header':
+        return treeItem('Final Order', { icon: 'tasklist', state: Expanded });
 
-      case "finalized-line":
-        return treeItem(node.menuName, { icon: "arrow-right", description: node.assignedTo });
+      case 'finalized-line':
+        return treeItem(node.menuName, {
+          icon: 'arrow-right',
+          description: node.assignedTo,
+        });
     }
   }
 
   /** Lazily resolves children for a given node (or the root). */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async getChildren(element?: TreeNode): Promise<TreeNode[]> {
     if (!element) {
       return this.getRootChildren();
@@ -114,18 +129,18 @@ export class OrderTreeDataProvider
     }
 
     switch (element.kind) {
-      case "order-header":
+      case 'order-header':
         return this.getOrderChildren(order);
-      case "my-wishlist-header":
+      case 'my-wishlist-header':
         return this.getMyWishlistChildren();
-      case "participants-header":
+      case 'participants-header':
         return this.getParticipantNodes();
-      case "participant":
+      case 'participant':
         return element.items.map((item) => ({
-          kind: "participant-item" as const,
+          kind: 'participant-item' as const,
           item,
         }));
-      case "finalized-header":
+      case 'finalized-header':
         return this.getFinalizedLines(order);
       default:
         return [];
@@ -135,9 +150,9 @@ export class OrderTreeDataProvider
   private getRootChildren(): TreeNode[] {
     const order = this.orderService.getOrder();
     if (order) {
-      return [{ kind: "order-header", order }];
+      return [{ kind: 'order-header', order }];
     }
-    return [{ kind: "no-order" }];
+    return [{ kind: 'no-order' }];
   }
 
   /**
@@ -147,15 +162,15 @@ export class OrderTreeDataProvider
    * everything into the resolved line items.
    */
   private getOrderChildren(order: Order): TreeNode[] {
-    if (order.status === "finalized") {
-      return [{ kind: "finalized-header" }];
+    if (order.status === 'finalized') {
+      return [{ kind: 'finalized-header' }];
     }
 
     const others = this.orderService.getOtherParticipants();
 
     return [
-      { kind: "my-wishlist-header" },
-      { kind: "participants-header", count: others.length },
+      { kind: 'my-wishlist-header' },
+      { kind: 'participants-header', count: others.length },
     ];
   }
 
@@ -163,17 +178,17 @@ export class OrderTreeDataProvider
   private getMyWishlistChildren(): TreeNode[] {
     const items = this.orderService.getMyWishlist();
     const nodes: TreeNode[] = items.map((item) => ({
-      kind: "my-wishlist-item" as const,
+      kind: 'my-wishlist-item' as const,
       item,
     }));
-    nodes.push({ kind: "add-item" });
+    nodes.push({ kind: 'add-item' });
     return nodes;
   }
 
   /** Lists other participants (excluding the current user) so the user can browse their picks. */
   private getParticipantNodes(): TreeNode[] {
     return this.orderService.getOtherParticipants().map((p) => ({
-      kind: "participant" as const,
+      kind: 'participant' as const,
       name: p.name,
       items: p.wishlist,
     }));
@@ -185,9 +200,9 @@ export class OrderTreeDataProvider
       return [];
     }
     return order.finalizedOrder.lines.map((line) => ({
-      kind: "finalized-line" as const,
+      kind: 'finalized-line' as const,
       menuName: formatMenuItem(line.menuItem),
-      assignedTo: line.assignedTo.join(" + "),
+      assignedTo: line.assignedTo.join(' + '),
     }));
   }
 }
@@ -221,13 +236,13 @@ function treeItem(label: string, opts: TreeItemOptions): vscode.TreeItem {
 }
 
 function formatMenuItem(menuItem: MenuItem): string {
-  const portion = menuItem.isHalf ? " (half)" : " (whole)";
+  const portion = menuItem.isHalf ? ' (half)' : ' (whole)';
   return `${menuItem.name}${portion}`;
 }
 
 /** Renders desire as a 5-star string (e.g. "★★★☆☆") for compact inline display. */
 function formatDesire(level: DesireLevel): string {
-  return "\u2605".repeat(level) + "\u2606".repeat(5 - level);
+  return '\u2605'.repeat(level) + '\u2606'.repeat(5 - level);
 }
 
 /**
