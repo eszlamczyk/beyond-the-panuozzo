@@ -21,8 +21,12 @@ export function registerOrderCommands(
     ),
     vscode.commands.registerCommand(
       Commands.RemoveWishlistItem,
-      (node: { item: { menuItem: { id: string } } }) =>
-        removeWishlistItem(orderService, node.item.menuItem.id)
+      (node?: { item?: { menuItem?: { id?: string } } }) => {
+        const menuItemId = node?.item?.menuItem?.id;
+        if (menuItemId) {
+          return removeWishlistItem(orderService, menuItemId);
+        }
+      }
     )
   );
 }
@@ -40,7 +44,7 @@ export function registerOrderCommands(
  * selections are locked and this command bails out early.
  */
 async function addWishlistItem(orderService: OrderService): Promise<void> {
-  const order = await orderService.getOrder();
+  const order = orderService.getOrder();
   if (!order || order.status !== "draft") {
     vscode.window.showWarningMessage("No active draft order.");
     return;

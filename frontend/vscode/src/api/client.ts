@@ -9,7 +9,7 @@ export interface OrderEvent {
 
 export interface IOrderClient {
   /** Registers a listener for order events (server push via WebSocket). */
-  onOrderEvent(listener: (event: OrderEvent) => void): void;
+  onOrderEvent(listener: (event: OrderEvent) => void): { dispose(): void };
 
   /** Returns the currently active order, or `undefined` if none exists. */
   getActiveOrder(): Promise<Order | undefined>;

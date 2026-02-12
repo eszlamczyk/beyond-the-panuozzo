@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext): void {
   updateAuthContext();
 
   // Notifications
-  showOrderNotifications(orderClient);
+  context.subscriptions.push(showOrderNotifications(orderClient));
 
   // Register tree views
   context.subscriptions.push(
@@ -77,7 +77,7 @@ function registerAuthCommands(
 }
 
 function showOrderNotifications(orderClient: MockOrderClient) {
-  orderClient.onOrderEvent((event) => {
+  return orderClient.onOrderEvent((event) => {
     if (event.type === "created") {
       vscode.window.showInformationMessage(
         `New panuozzo order! Add your wishlist items.`

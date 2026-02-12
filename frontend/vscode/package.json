@@ -64,6 +64,13 @@
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "btp.addWishlistItem",
+          "when": "view == btp-explorer",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "btp.removeWishlistItem",

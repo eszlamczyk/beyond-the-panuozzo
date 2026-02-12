@@ -25,11 +25,11 @@ export class OrderService implements vscode.Disposable {
     private readonly client: IOrderClient,
     private readonly auth: AuthService,
   ) {
-    client.onOrderEvent((event) => {
-      this.order = event.order;
-      this._onDidChange.fire();
-    });
     this.disposables.push(
+      client.onOrderEvent((event) => {
+        this.order = event.order;
+        this._onDidChange.fire();
+      }),
       auth.onDidChangeSession(() => {
         this.userId = undefined;
         this._onDidChange.fire();
@@ -59,12 +59,10 @@ export class OrderService implements vscode.Disposable {
    * Returns the cached order only if the user has an active session.
    * This prevents the UI from rendering stale order data after sign-out.
    */
-  async getOrder(): Promise<Order | undefined> {
-    const session = await this.auth.getSession();
-    if (!session) {
+  getOrder(): Order | undefined {
+    if (!this.userId) {
       return undefined;
     }
-    this.userId = session.sub;
     return this.order;
   }
 

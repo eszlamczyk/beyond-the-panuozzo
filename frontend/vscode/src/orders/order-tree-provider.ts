@@ -104,7 +104,7 @@ export class OrderTreeDataProvider
       return this.getRootChildren();
     }
 
-    const order = await this.orderService.getOrder();
+    const order = this.orderService.getOrder();
     if (!order) {
       return [];
     }
@@ -128,8 +128,8 @@ export class OrderTreeDataProvider
     }
   }
 
-  private async getRootChildren(): Promise<TreeNode[]> {
-    const order = await this.orderService.getOrder();
+  private getRootChildren(): TreeNode[] {
+    const order = this.orderService.getOrder();
     if (order) {
       return [{ kind: "order-header", order }];
     }

@@ -105,8 +105,16 @@ export class MockOrderClient implements IOrderClient {
     this.scheduleNewOrder();
   }
 
-  onOrderEvent(listener: (event: OrderEvent) => void): void {
+  onOrderEvent(listener: (event: OrderEvent) => void) {
     this.listeners.push(listener);
+    return {
+      dispose: () => {
+        const idx = this.listeners.indexOf(listener);
+        if (idx !== -1) {
+          this.listeners.splice(idx, 1);
+        }
+      },
+    };
   }
 
   dispose(): void {
