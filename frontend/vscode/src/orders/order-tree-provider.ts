@@ -1,7 +1,25 @@
 import * as vscode from "vscode";
 import { OrderService } from "./order.service";
 import { Commands } from "../constants";
-import { MenuItem, Order, WishlistItem } from "../types";
+import { DesireLevel, MenuItem, Order, WishlistItem } from "../types";
+
+function formatDesire(level: DesireLevel): string {
+  return "\u2605".repeat(level) + "\u2606".repeat(5 - level);
+}
+
+function buildWishlistTreeItem(
+  wishlistItem: WishlistItem,
+  icon: string,
+  contextValue?: string,
+): vscode.TreeItem {
+  const item = new vscode.TreeItem(formatMenuItem(wishlistItem.menuItem));
+  item.description = formatDesire(wishlistItem.desireLevel);
+  item.iconPath = new vscode.ThemeIcon(icon);
+  if (contextValue) {
+    item.contextValue = contextValue;
+  }
+  return item;
+}
 
 type TreeNode =
   | { kind: "order-header"; order: Order }
@@ -63,13 +81,8 @@ export class OrderTreeDataProvider
         return item;
       }
 
-      case "my-wishlist-item": {
-        const item = new vscode.TreeItem(formatMenuItem(node.item.menuItem));
-        item.description = `x${node.item.quantity}`;
-        item.iconPath = new vscode.ThemeIcon("circle-filled");
-        item.contextValue = "wishlistItem";
-        return item;
-      }
+      case "my-wishlist-item":
+        return buildWishlistTreeItem(node.item, "circle-filled", "wishlistItem");
 
       case "add-item": {
         const item = new vscode.TreeItem("Add item...");
@@ -102,12 +115,8 @@ export class OrderTreeDataProvider
         return item;
       }
 
-      case "participant-item": {
-        const item = new vscode.TreeItem(formatMenuItem(node.item.menuItem));
-        item.description = `x${node.item.quantity}`;
-        item.iconPath = new vscode.ThemeIcon("circle-outline");
-        return item;
-      }
+      case "participant-item":
+        return buildWishlistTreeItem(node.item, "circle-outline");
 
       case "finalized-header": {
         const item = new vscode.TreeItem(

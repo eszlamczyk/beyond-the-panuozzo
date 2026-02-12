@@ -6,9 +6,12 @@ export interface MenuItem {
   isHalf: boolean;
 }
 
+/** 1 = "meh, if others want it" … 5 = "I need this in my life" */
+export type DesireLevel = 1 | 2 | 3 | 4 | 5;
+
 export interface WishlistItem {
   menuItem: MenuItem;
-  quantity: number;
+  desireLevel: DesireLevel;
 }
 
 export interface Participant {

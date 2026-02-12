@@ -34,15 +34,15 @@ function buildMockParticipants(): Participant[] {
       userId: "alice-id",
       name: "Alice",
       wishlist: [
-        { menuItem: MOCK_MENU[4], quantity: 1 }, // Margherita whole
-        { menuItem: MOCK_MENU[7], quantity: 1 }, // Vegana half
+        { menuItem: MOCK_MENU[4], desireLevel: 4 }, // Margherita whole
+        { menuItem: MOCK_MENU[7], desireLevel: 2 }, // Vegana half
       ],
     },
     {
       userId: "bob-id",
       name: "Bob",
       wishlist: [
-        { menuItem: MOCK_MENU[3], quantity: 1 }, // Diavola half
+        { menuItem: MOCK_MENU[3], desireLevel: 5 }, // Diavola half
       ],
     },
   ];
@@ -64,12 +64,10 @@ function buildFinalizedOrder(participants: Participant[]): FinalizedOrder {
       existing.push({ participantName: item.participantName, menuItem: item.menuItem });
       halfsByName.set(baseName, existing);
     } else {
-      for (let i = 0; i < item.quantity; i++) {
-        lines.push({
-          menuItem: item.menuItem,
-          assignedTo: [item.participantName],
-        });
-      }
+      lines.push({
+        menuItem: item.menuItem,
+        assignedTo: [item.participantName],
+      });
     }
   }
 
@@ -135,12 +133,7 @@ export class MockOrderClient implements IOrderClient {
       return;
     }
 
-    const existing = me.wishlist.find((w) => w.menuItem.id === item.menuItem.id);
-    if (existing) {
-      existing.quantity += item.quantity;
-    } else {
-      me.wishlist.push({ ...item });
-    }
+    me.wishlist.push({ ...item });
 
     this._onOrderEvent.fire({ type: "updated", order: this.order });
   }
