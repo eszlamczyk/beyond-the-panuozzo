@@ -67,9 +67,21 @@ export class RefreshTokenService {
       throw new UnauthorizedException('Refresh token expired.');
     }
 
-    // Mark the current token as used so it cannot be replayed.
-    existing.revoked = true;
-    await this.repo.save(existing);
+    // Atomically mark the token as used. The WHERE clause ensures that only
+    // one concurrent request can succeed; any racing request will see
+    // affected === 0 and trigger family-wide revocation.
+    const result = await this.repo.update(
+      { tokenHash: hash, revoked: false },
+      { revoked: true },
+    );
+
+    if (result.affected === 0) {
+      // Another request already consumed this token — treat as replay.
+      await this.revokeFamily(existing.family);
+      throw new UnauthorizedException(
+        'Refresh token reuse detected. All sessions revoked.',
+      );
+    }
 
     const user: RefreshTokenUser = {
       googleId: existing.googleId,
