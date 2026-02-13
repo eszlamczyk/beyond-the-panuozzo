@@ -19,7 +19,7 @@ import { AuthenticationService } from './authentication.service';
 import { GoogleAuthenticationGuard } from './google-authentication.guard';
 import { googleUserSchema } from './google-user.schema';
 import { JwtAuthenticationGuard } from './jwt-authentication.guard';
-import type { JwtPayload } from './jwt-payload.schema';
+import { jwtPayloadSchema } from './jwt-payload.schema';
 import { RefreshTokenService } from './refresh-token.service';
 
 /**
@@ -136,8 +136,11 @@ export class AuthenticationController {
   @Post('sign-out')
   @UseGuards(JwtAuthenticationGuard)
   async signOut(@Req() req: Request): Promise<{ ok: true }> {
-    const payload = req.user as JwtPayload;
-    await this.refreshTokenService.revokeAllForUser(payload.sub);
+    const result = jwtPayloadSchema.safeParse(req.user);
+    if (!result.success) {
+      throw new UnauthorizedException('Invalid token payload.');
+    }
+    await this.refreshTokenService.revokeAllForUser(result.data.sub);
     return { ok: true };
   }
 }
