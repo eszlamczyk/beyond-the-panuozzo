@@ -119,7 +119,7 @@ export class AuthenticationController {
     if (!refreshToken) {
       throw new BadRequestException('Missing refresh_token.');
     }
-    
+
     if (!/^[0-9a-f]{64}$/.test(refreshToken)) {
       throw new BadRequestException('Invalid refresh_token.');
     }
@@ -127,8 +127,7 @@ export class AuthenticationController {
     const { newRefreshToken, user } =
       await this.refreshTokenService.rotateRefreshToken(refreshToken);
 
-    const accessToken =
-      this.authenticationService.generateJwt(user);
+    const accessToken = this.authenticationService.generateJwt(user);
 
     return { token: accessToken, refresh_token: newRefreshToken };
   }
