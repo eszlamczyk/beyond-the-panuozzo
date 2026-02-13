@@ -18,9 +18,11 @@ interface JwtPayload {
  * 1. {@link signIn} opens the browser to the backend's Google OAuth endpoint.
  * 2. After successful authentication the backend redirects back to a
  *    `vscode://` URI, which VS Code routes to {@link handleUri}.
- * 3. The received JWT is persisted in {@link vscode.SecretStorage} and
- *    subsequent calls to {@link getSession} / {@link getToken} return
- *    the cached credentials until they expire.
+ * 3. The received JWT and refresh token are persisted in
+ *    {@link vscode.SecretStorage} and subsequent calls to
+ *    {@link getSession} / {@link getToken} return the cached credentials.
+ *    When the short-lived JWT expires, a refresh token is used to
+ *    transparently obtain a new one.
  *
  * Subscribe to {@link onDidChangeSession} to react to sign-in / sign-out
  * events (e.g. to refresh UI state).
@@ -34,6 +36,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
   private secrets: vscode.SecretStorage;
   private cachedPayload: JwtPayload | undefined;
   private extensionMode: vscode.ExtensionMode;
+  private refreshTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     this.secrets = context.secrets;
@@ -41,6 +44,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
   }
 
   dispose() {
+    this.clearRefreshTimer();
     this._onDidChangeSession.dispose();
   }
 
@@ -54,9 +58,20 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     }
 
     await this.secrets.store(SecretKeys.Jwt, token);
+
+    const refreshToken = params.get("refresh_token");
+    if (refreshToken) {
+      await this.secrets.store(SecretKeys.RefreshToken, refreshToken);
+    }
+
     this.cachedPayload = undefined;
     this._onDidChangeSession.fire();
     vscode.window.showInformationMessage("Signed in successfully.");
+
+    const payload = this.decodeJwt(token);
+    if (payload) {
+      this.scheduleProactiveRefresh(payload);
+    }
   }
 
   /** Opens the browser to initiate Google OAuth sign-in against the backend. */
@@ -70,18 +85,34 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     await vscode.env.openExternal(vscode.Uri.parse(authUrl));
   }
 
-  /** Deletes the stored JWT and notifies listeners of the session change. */
+  /** Revokes server-side tokens, clears local storage, and notifies listeners. */
   async signOut(): Promise<void> {
-    await this.secrets.delete(SecretKeys.Jwt);
-    this.cachedPayload = undefined;
+    // Best-effort server-side revocation
+    try {
+      const token = await this.secrets.get(SecretKeys.Jwt);
+      if (token) {
+        const backendUrl = this.getBackendUrl();
+        await fetch(`${backendUrl}${ApiPaths.AuthSignOut}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch {
+      // Best effort — ignore network errors
+    }
+
+    await this.clearTokens();
     this._onDidChangeSession.fire();
     vscode.window.showInformationMessage("Signed out.");
   }
 
   /**
    * Returns the current user's decoded JWT payload, or `undefined` if
-   * not signed in or the token has expired. Expired tokens are automatically
-   * removed from secret storage.
+   * not signed in. When the JWT has expired, transparently refreshes it
+   * using the stored refresh token.
    */
   async getSession(): Promise<JwtPayload | undefined> {
     if (this.cachedPayload && !this.isExpired(this.cachedPayload)) {
@@ -89,19 +120,25 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     }
 
     const token = await this.secrets.get(SecretKeys.Jwt);
-    if (!token) {
-      return undefined;
+    if (token) {
+      const payload = this.decodeJwt(token);
+      if (payload && !this.isExpired(payload)) {
+        this.cachedPayload = payload;
+        this.scheduleProactiveRefresh(payload);
+        return payload;
+      }
     }
 
-    const payload = this.decodeJwt(token);
-    if (!payload || this.isExpired(payload)) {
-      await this.secrets.delete(SecretKeys.Jwt);
-      this.cachedPayload = undefined;
-      return undefined;
+    // JWT is missing or expired — attempt refresh
+    const refreshed = await this.refreshAccessToken();
+    if (refreshed) {
+      this.scheduleProactiveRefresh(refreshed);
+      return refreshed;
     }
 
-    this.cachedPayload = payload;
-    return payload;
+    // Refresh also failed — no valid session
+    await this.clearTokens();
+    return undefined;
   }
 
   /** Returns the cached user ID (`sub` claim) synchronously, or `""` if not signed in. */
@@ -116,6 +153,77 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
       return undefined;
     }
     return this.secrets.get(SecretKeys.Jwt);
+  }
+
+  /**
+   * Attempts to obtain a new access JWT using the stored refresh token.
+   * On success, stores the new JWT and refresh token and returns the decoded payload.
+   * On failure, clears all tokens (unless the failure was a network error).
+   */
+  private async refreshAccessToken(): Promise<JwtPayload | undefined> {
+    const refreshToken = await this.secrets.get(SecretKeys.RefreshToken);
+    if (!refreshToken) {
+      return undefined;
+    }
+
+    try {
+      const backendUrl = this.getBackendUrl();
+      const response = await fetch(`${backendUrl}${ApiPaths.AuthRefresh}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!response.ok) {
+        // Refresh token is invalid/expired/revoked — clear everything
+        await this.clearTokens();
+        return undefined;
+      }
+
+      const data = (await response.json()) as {
+        token: string;
+        refresh_token: string;
+      };
+
+      await this.secrets.store(SecretKeys.Jwt, data.token);
+      await this.secrets.store(SecretKeys.RefreshToken, data.refresh_token);
+
+      const payload = this.decodeJwt(data.token);
+      if (payload) {
+        this.cachedPayload = payload;
+      }
+      return payload;
+    } catch {
+      // Network error — don't clear tokens, the refresh token may still be valid
+      return undefined;
+    }
+  }
+
+  /** Schedules a proactive token refresh 1 minute before the JWT expires. */
+  private scheduleProactiveRefresh(payload: JwtPayload): void {
+    this.clearRefreshTimer();
+    const msUntilExpiry = payload.exp * 1000 - Date.now();
+    const refreshIn = Math.max(msUntilExpiry - 60_000, 0);
+    this.refreshTimer = setTimeout(async () => {
+      const refreshed = await this.refreshAccessToken();
+      if (refreshed) {
+        this.scheduleProactiveRefresh(refreshed);
+      }
+    }, refreshIn);
+  }
+
+  private clearRefreshTimer(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
+  }
+
+  private async clearTokens(): Promise<void> {
+    this.clearRefreshTimer();
+    await this.secrets.delete(SecretKeys.Jwt);
+    await this.secrets.delete(SecretKeys.RefreshToken);
+    this.cachedPayload = undefined;
   }
 
   /** Resolves the backend base URL — production URL in production mode, configurable in development. */

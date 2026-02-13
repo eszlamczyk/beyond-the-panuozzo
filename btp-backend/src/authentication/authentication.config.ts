@@ -14,10 +14,16 @@ interface JwtConfig {
   secret: string;
 }
 
+interface RefreshTokenConfig {
+  /** How many days a refresh token stays valid since its last use. */
+  lifetimeDays: number;
+}
+
 /** Namespaced configuration for the authentication module. */
 export interface AuthenticationConfig {
   google: GoogleConfig;
   jwt: JwtConfig;
+  refreshToken: RefreshTokenConfig;
   /** Whitelist of URIs the OAuth flow is allowed to redirect to after login (e.g. `vscode://…`, `http://localhost:3000/callback`). */
   allowedRedirectUris: string[];
 }
@@ -40,6 +46,12 @@ export const authenticationConfig = registerAs(
     },
     jwt: {
       secret: requireEnv('JWT_SECRET'),
+    },
+    refreshToken: {
+      lifetimeDays: parseInt(
+        process.env.REFRESH_TOKEN_LIFETIME_DAYS ?? '90',
+        10,
+      ),
     },
     allowedRedirectUris: (process.env.ALLOWED_REDIRECT_URIS ?? '')
       .split(',')
