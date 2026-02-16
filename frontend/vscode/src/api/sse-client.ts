@@ -66,7 +66,7 @@ export class SseOrderClient implements IOrderClient {
         res.setEncoding('utf-8');
 
         res.on('data', (chunk: string) => {
-          buffer += chunk;
+          buffer += chunk.replaceAll('\r\n', '\n');
           // SSE messages are separated by double newlines
           const parts = buffer.split('\n\n');
           // Keep the last (potentially incomplete) part in the buffer
