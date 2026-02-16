@@ -1,6 +1,6 @@
-import { MenuItem, Order, WishlistItem } from "../types";
+import type { MenuItem, Order, WishlistItem } from '../types';
 
-export type OrderEventType = "created" | "updated" | "finalized";
+export type OrderEventType = 'created' | 'updated' | 'finalized';
 
 export interface OrderEvent {
   type: OrderEventType;
