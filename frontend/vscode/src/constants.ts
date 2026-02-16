@@ -34,8 +34,8 @@ export const SecretKeys = {
 
 /** Backend API paths. */
 export const ApiPaths = {
-  AuthGoogle: "/auth/google",
-  OrderEvents: "/orders/events",
+  AuthGoogle: '/auth/google',
+  OrderEvents: '/orders/events',
 } as const;
 
 /** Internal extension hyperlink paths */

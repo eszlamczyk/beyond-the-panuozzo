@@ -1,13 +1,13 @@
-import * as vscode from "vscode";
-import { AuthService } from "./auth";
-import { AccountTreeDataProvider } from "./account-tree-provider";
-import type { IOrderClient } from "./api/client";
-import { MockOrderClient } from "./api/mock-client";
-import { SseOrderClient } from "./api/sse-client";
-import { OrderService } from "./orders/order.service";
-import { OrderTreeDataProvider } from "./orders/order-tree-provider";
-import { registerOrderCommands } from "./orders/commands";
-import { BackendUrl, Commands, Config, Views } from "./constants";
+import * as vscode from 'vscode';
+import { AuthService } from './auth';
+import { AccountTreeDataProvider } from './account-tree-provider';
+import type { IOrderClient } from './api/client';
+import { MockOrderClient } from './api/mock-client';
+import { SseOrderClient } from './api/sse-client';
+import { OrderService } from './orders/order.service';
+import { OrderTreeDataProvider } from './orders/order-tree-provider';
+import { registerOrderCommands } from './orders/commands';
+import { BackendUrl, Commands, Config, Views } from './constants';
 
 /** Called by VS Code when the extension is activated. */
 export function activate(context: vscode.ExtensionContext): void {

@@ -1,7 +1,7 @@
-import * as http from "node:http";
-import * as https from "node:https";
-import { IOrderClient, OrderEvent } from "./client";
-import { MenuItem, Order, WishlistItem } from "../types";
+import * as http from 'node:http';
+import * as https from 'node:https';
+import type { IOrderClient, OrderEvent } from './client';
+import type { MenuItem, Order, WishlistItem } from '../types';
 
 /** Minimum delay between reconnection attempts (ms). */
 const BASE_RECONNECT_MS = 1_000;
@@ -39,17 +39,17 @@ export class SseOrderClient implements IOrderClient {
       return;
     }
 
-    const url = new URL("/orders/events", this.backendUrl);
-    const mod = url.protocol === "https:" ? https : http;
+    const url = new URL('/orders/events', this.backendUrl);
+    const mod = url.protocol === 'https:' ? https : http;
 
     const req = mod.request(
       url,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: "text/event-stream",
-          "Cache-Control": "no-cache",
+          Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache',
         },
       },
       (res) => {
@@ -62,28 +62,28 @@ export class SseOrderClient implements IOrderClient {
         // Successfully connected — reset backoff
         this.reconnectDelay = BASE_RECONNECT_MS;
 
-        let buffer = "";
-        res.setEncoding("utf-8");
+        let buffer = '';
+        res.setEncoding('utf-8');
 
-        res.on("data", (chunk: string) => {
+        res.on('data', (chunk: string) => {
           buffer += chunk;
           // SSE messages are separated by double newlines
-          const parts = buffer.split("\n\n");
+          const parts = buffer.split('\n\n');
           // Keep the last (potentially incomplete) part in the buffer
-          buffer = parts.pop() ?? "";
+          buffer = parts.pop() ?? '';
 
           for (const part of parts) {
             this.handleSseMessage(part);
           }
         });
 
-        res.on("end", () => {
+        res.on('end', () => {
           if (!this.disposed) {
             this.scheduleReconnect();
           }
         });
 
-        res.on("error", () => {
+        res.on('error', () => {
           if (!this.disposed) {
             this.scheduleReconnect();
           }
@@ -91,7 +91,7 @@ export class SseOrderClient implements IOrderClient {
       },
     );
 
-    req.on("error", () => {
+    req.on('error', () => {
       if (!this.disposed) {
         this.scheduleReconnect();
       }
@@ -119,19 +119,22 @@ export class SseOrderClient implements IOrderClient {
   }
 
   async getActiveOrder(): Promise<Order | undefined> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   async getMenu(): Promise<MenuItem[]> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   async addWishlistItem(_orderId: string, _item: WishlistItem): Promise<void> {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
-  async removeWishlistItem(_orderId: string, _menuItemId: string): Promise<void> {
-    throw new Error("Not implemented");
+  async removeWishlistItem(
+    _orderId: string,
+    _menuItemId: string,
+  ): Promise<void> {
+    throw new Error('Not implemented');
   }
 
   dispose(): void {
@@ -157,11 +160,11 @@ export class SseOrderClient implements IOrderClient {
 
   /** Parses a single SSE frame and emits the event to listeners. */
   private handleSseMessage(raw: string): void {
-    let data = "";
-    for (const line of raw.split("\n")) {
-      if (line.startsWith("data:")) {
+    let data = '';
+    for (const line of raw.split('\n')) {
+      if (line.startsWith('data:')) {
         // Append data field (strip "data:" prefix and optional leading space)
-        data += line.slice(line[5] === " " ? 6 : 5);
+        data += line.slice(line[5] === ' ' ? 6 : 5);
       }
       // Ignore other SSE fields (id:, event:, retry:, comments) for now
     }
