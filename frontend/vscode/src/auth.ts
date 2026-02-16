@@ -68,14 +68,14 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
 
     await this.secrets.store(SecretKeys.Jwt, token);
 
-    const refreshToken = params.get("refresh_token");
+    const refreshToken = params.get('refresh_token');
     if (refreshToken) {
       await this.secrets.store(SecretKeys.RefreshToken, refreshToken);
     }
 
     this.cachedPayload = undefined;
     this._onDidChangeSession.fire();
-    vscode.window.showInformationMessage("Signed in successfully.");
+    vscode.window.showInformationMessage('Signed in successfully.');
 
     const payload = this.decodeJwt(token);
     if (payload) {
@@ -101,9 +101,9 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
       if (token) {
         const backendUrl = this.getBackendUrl();
         await fetch(`${backendUrl}${ApiPaths.AuthSignOut}`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
@@ -177,8 +177,8 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     try {
       const backendUrl = this.getBackendUrl();
       const response = await fetch(`${backendUrl}${ApiPaths.AuthRefresh}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
 

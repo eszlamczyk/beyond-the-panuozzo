@@ -29,15 +29,15 @@ export const ExtensionId = 'eszlamczyk.beyond-the-panuozzo' as const;
 
 /** Secret-storage keys. */
 export const SecretKeys = {
-  Jwt: "btp.jwt",
-  RefreshToken: "btp.refreshToken",
+  Jwt: 'btp.jwt',
+  RefreshToken: 'btp.refreshToken',
 } as const;
 
 /** Backend API paths. */
 export const ApiPaths = {
-  AuthGoogle: "/auth/google",
-  AuthRefresh: "/auth/refresh",
-  AuthSignOut: "/auth/sign-out",
+  AuthGoogle: '/auth/google',
+  AuthRefresh: '/auth/refresh',
+  AuthSignOut: '/auth/sign-out',
 } as const;
 
 /** Internal extension hyperlink paths */
