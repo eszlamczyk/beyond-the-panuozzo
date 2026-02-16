@@ -13,6 +13,7 @@ describe('JwtStrategy', () => {
         callbackUrl: 'http://localhost:3000/auth/google/callback',
       },
       jwt: { secret: 'test-secret' },
+      refreshToken: { lifetimeDays: 90 },
       allowedRedirectUris: [],
     };
 
