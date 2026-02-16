@@ -118,19 +118,19 @@ export class SseOrderClient implements IOrderClient {
     };
   }
 
-  async getActiveOrder(): Promise<Order | undefined> {
+  getActiveOrder(): Promise<Order | undefined> {
     throw new Error('Not implemented');
   }
 
-  async getMenu(): Promise<MenuItem[]> {
+  getMenu(): Promise<MenuItem[]> {
     throw new Error('Not implemented');
   }
 
-  async addWishlistItem(_orderId: string, _item: WishlistItem): Promise<void> {
+  addWishlistItem(_orderId: string, _item: WishlistItem): Promise<void> {
     throw new Error('Not implemented');
   }
 
-  async removeWishlistItem(
+  removeWishlistItem(
     _orderId: string,
     _menuItemId: string,
   ): Promise<void> {
