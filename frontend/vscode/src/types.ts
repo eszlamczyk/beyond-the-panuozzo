@@ -1,4 +1,4 @@
-export type OrderStatus = "draft" | "finalized";
+export type OrderStatus = 'draft' | 'finalized';
 
 export interface MenuItem {
   id: string;

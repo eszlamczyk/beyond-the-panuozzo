@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { AuthService } from "./auth";
-import { Commands } from "./constants";
+import * as vscode from 'vscode';
+import type { AuthService } from './auth';
+import { Commands } from './constants';
 
 /**
  * Discriminated union of nodes rendered in the Account tree view.
@@ -10,9 +10,9 @@ import { Commands } from "./constants";
  * - `sign-out` – clicking clears the stored JWT and signs the user out.
  */
 type AccountNode =
-  | { kind: "sign-in" }
-  | { kind: "account"; name: string; email: string }
-  | { kind: "sign-out" };
+  | { kind: 'sign-in' }
+  | { kind: 'account'; name: string; email: string }
+  | { kind: 'sign-out' };
 
 /**
  * Tree data provider for the "Account" sidebar section.
@@ -44,29 +44,29 @@ export class AccountTreeDataProvider
   /** Converts an {@link AccountNode} into a VS Code tree item for display. */
   getTreeItem(node: AccountNode): vscode.TreeItem {
     switch (node.kind) {
-      case "sign-in": {
-        const item = new vscode.TreeItem("Sign in with Google");
-        item.iconPath = new vscode.ThemeIcon("sign-in");
+      case 'sign-in': {
+        const item = new vscode.TreeItem('Sign in with Google');
+        item.iconPath = new vscode.ThemeIcon('sign-in');
         item.command = {
           command: Commands.SignIn,
-          title: "Sign in with Google",
+          title: 'Sign in with Google',
         };
         return item;
       }
 
-      case "account": {
+      case 'account': {
         const item = new vscode.TreeItem(`Signed in as ${node.name}`);
-        item.iconPath = new vscode.ThemeIcon("account");
+        item.iconPath = new vscode.ThemeIcon('account');
         item.description = node.email;
         return item;
       }
 
-      case "sign-out": {
-        const item = new vscode.TreeItem("Sign out");
-        item.iconPath = new vscode.ThemeIcon("sign-out");
+      case 'sign-out': {
+        const item = new vscode.TreeItem('Sign out');
+        item.iconPath = new vscode.ThemeIcon('sign-out');
         item.command = {
           command: Commands.SignOut,
-          title: "Sign out",
+          title: 'Sign out',
         };
         return item;
       }
@@ -80,11 +80,11 @@ export class AccountTreeDataProvider
   async getChildren(): Promise<AccountNode[]> {
     const session = await this.auth.getSession();
     if (!session) {
-      return [{ kind: "sign-in" }];
+      return [{ kind: 'sign-in' }];
     }
     return [
-      { kind: "account", name: session.name, email: session.email },
-      { kind: "sign-out" },
+      { kind: 'account', name: session.name, email: session.email },
+      { kind: 'sign-out' },
     ];
   }
 }

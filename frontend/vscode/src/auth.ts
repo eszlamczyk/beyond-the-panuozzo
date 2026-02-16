@@ -1,5 +1,12 @@
-import * as vscode from "vscode";
-import { ApiPaths, BackendUrl, Config, ExtensionId, InternalPaths, SecretKeys } from "./constants";
+import * as vscode from 'vscode';
+import {
+  ApiPaths,
+  BackendUrl,
+  Config,
+  ExtensionId,
+  InternalPaths,
+  SecretKeys,
+} from './constants';
 
 /**
  * Decoded JWT token payload containing user identity and expiration.
@@ -47,16 +54,18 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
   /** Called by VSCode when a vscode://<publisher>.<name>/... URI is opened. */
   async handleUri(uri: vscode.Uri): Promise<void> {
     const params = new URLSearchParams(uri.query);
-    const token = params.get("token");
+    const token = params.get('token');
     if (!token) {
-      vscode.window.showErrorMessage("Authentication failed: no token received.");
+      vscode.window.showErrorMessage(
+        'Authentication failed: no token received.',
+      );
       return;
     }
 
     await this.secrets.store(SecretKeys.Jwt, token);
     this.cachedPayload = undefined;
     this._onDidChangeSession.fire();
-    vscode.window.showInformationMessage("Signed in successfully.");
+    vscode.window.showInformationMessage('Signed in successfully.');
   }
 
   /** Opens the browser to initiate Google OAuth sign-in against the backend. */
@@ -64,8 +73,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     const backendUrl = this.getBackendUrl();
     const callbackUri = this.getCallbackUri();
 
-    const authUrl =
-      `${backendUrl}${ApiPaths.AuthGoogle}?redirect_uri=${encodeURIComponent(callbackUri)}`;
+    const authUrl = `${backendUrl}${ApiPaths.AuthGoogle}?redirect_uri=${encodeURIComponent(callbackUri)}`;
 
     await vscode.env.openExternal(vscode.Uri.parse(authUrl));
   }
@@ -75,7 +83,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     await this.secrets.delete(SecretKeys.Jwt);
     this.cachedPayload = undefined;
     this._onDidChangeSession.fire();
-    vscode.window.showInformationMessage("Signed out.");
+    vscode.window.showInformationMessage('Signed out.');
   }
 
   /**
@@ -106,7 +114,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
 
   /** Returns the cached user ID (`sub` claim) synchronously, or `""` if not signed in. */
   getUserId(): string {
-    return this.cachedPayload?.sub ?? "";
+    return this.cachedPayload?.sub ?? '';
   }
 
   /** Returns the raw JWT string if a valid session exists, otherwise `undefined`. */
@@ -135,12 +143,19 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
   /** Decodes the base64url-encoded payload of a JWT without verifying the signature. */
   private decodeJwt(token: string): JwtPayload | undefined {
     try {
-      const parts = token.split(".");
+      const parts = token.split('.');
       if (parts.length !== 3) {
         return undefined;
       }
-      const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-      if (!payload.sub || !payload.exp) {
+      const payload: unknown = JSON.parse(
+        Buffer.from(parts[1], 'base64url').toString(),
+      );
+      if (
+        typeof payload !== 'object' ||
+        payload === null ||
+        !('sub' in payload) ||
+        !('exp' in payload)
+      ) {
         return undefined;
       }
       return payload as JwtPayload;
