@@ -130,10 +130,7 @@ export class SseOrderClient implements IOrderClient {
     throw new Error('Not implemented');
   }
 
-  removeWishlistItem(
-    _orderId: string,
-    _menuItemId: string,
-  ): Promise<void> {
+  removeWishlistItem(_orderId: string, _menuItemId: string): Promise<void> {
     throw new Error('Not implemented');
   }
 
