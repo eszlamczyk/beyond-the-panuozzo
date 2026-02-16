@@ -212,11 +212,12 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     this.clearRefreshTimer();
     const msUntilExpiry = payload.exp * 1000 - Date.now();
     const refreshIn = Math.max(msUntilExpiry - 60_000, 0);
-    this.refreshTimer = setTimeout(async () => {
-      const refreshed = await this.refreshAccessToken();
-      if (refreshed) {
-        this.scheduleProactiveRefresh(refreshed);
-      }
+    this.refreshTimer = setTimeout(() => {
+      void this.refreshAccessToken().then((refreshed) => {
+        if (refreshed) {
+          this.scheduleProactiveRefresh(refreshed);
+        }
+      });
     }, refreshIn);
   }
 
