@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   Inject,
+  Post,
   Query,
   Req,
   Res,
@@ -10,11 +12,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 import { authorizationConfig } from '../authorization/authorization.config';
 import { AuthenticationService } from './authentication.service';
 import { GoogleAuthenticationGuard } from './google-authentication.guard';
 import { googleUserSchema } from './google-user.schema';
+import { JwtAuthenticationGuard } from './jwt-authentication.guard';
+import { jwtPayloadSchema } from './jwt-payload.schema';
+import { RefreshTokenService } from './refresh-token.service';
 
 /**
  * Handles the Google OAuth 2.0 login flow requests.
@@ -36,6 +42,7 @@ import { googleUserSchema } from './google-user.schema';
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
+    private readonly refreshTokenService: RefreshTokenService,
     @Inject(authorizationConfig.KEY)
     private readonly authzConfig: ConfigType<typeof authorizationConfig>,
   ) {}
@@ -60,11 +67,11 @@ export class AuthenticationController {
    */
   @Get('google/callback')
   @UseGuards(GoogleAuthenticationGuard)
-  googleCallback(
+  async googleCallback(
     @Req() req: Request,
     @Query('state') state: string,
     @Res() res: Response,
-  ): void {
+  ): Promise<void> {
     const result = googleUserSchema.safeParse(req.user);
     if (!result.success) {
       throw new UnauthorizedException('Invalid user profile.');
@@ -83,9 +90,12 @@ export class AuthenticationController {
     }
 
     const token = this.authenticationService.generateJwt(user);
+    const refreshToken =
+      await this.refreshTokenService.createRefreshToken(user);
 
     const url = new URL(redirectUri);
     url.searchParams.set('token', token);
+    url.searchParams.set('refresh_token', refreshToken);
     if (clientState) {
       url.searchParams.set('state', clientState);
     }
@@ -98,6 +108,40 @@ export class AuthenticationController {
     }
 
     res.type('html').send(buildRedirectPage(targetUrl));
+  }
+
+  /** Exchanges a valid refresh token for a new access JWT and a rotated refresh token. */
+  @Post('refresh')
+  @UseGuards(ThrottlerGuard)
+  async refresh(
+    @Body('refresh_token') refreshToken: string,
+  ): Promise<{ token: string; refresh_token: string }> {
+    if (!refreshToken) {
+      throw new BadRequestException('Missing refresh_token.');
+    }
+
+    if (!/^[0-9a-f]{64}$/.test(refreshToken)) {
+      throw new BadRequestException('Invalid refresh_token.');
+    }
+
+    const { newRefreshToken, user } =
+      await this.refreshTokenService.rotateRefreshToken(refreshToken);
+
+    const accessToken = this.authenticationService.generateJwt(user);
+
+    return { token: accessToken, refresh_token: newRefreshToken };
+  }
+
+  /** Revokes all refresh tokens for the authenticated user. */
+  @Post('sign-out')
+  @UseGuards(JwtAuthenticationGuard)
+  async signOut(@Req() req: Request): Promise<{ ok: true }> {
+    const result = jwtPayloadSchema.safeParse(req.user);
+    if (!result.success) {
+      throw new UnauthorizedException('Invalid token payload.');
+    }
+    await this.refreshTokenService.revokeAllForUser(result.data.sub);
+    return { ok: true };
   }
 }
 
