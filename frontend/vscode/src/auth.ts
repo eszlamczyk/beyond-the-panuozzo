@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { z } from 'zod';
 import {
   ApiPaths,
   BackendUrl,
@@ -7,6 +8,11 @@ import {
   InternalPaths,
   SecretKeys,
 } from './constants';
+
+const RefreshResponseSchema = z.object({
+  token: z.string(),
+  refresh_token: z.string(),
+});
 
 /**
  * Decoded JWT token payload containing user identity and expiration.
@@ -188,10 +194,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
         return undefined;
       }
 
-      const data = (await response.json()) as {
-        token: string;
-        refresh_token: string;
-      };
+      const data = RefreshResponseSchema.parse(await response.json());
 
       await this.secrets.store(SecretKeys.Jwt, data.token);
       await this.secrets.store(SecretKeys.RefreshToken, data.refresh_token);
