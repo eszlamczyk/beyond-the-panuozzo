@@ -29,5 +29,5 @@ export class Order {
   items!: UserOrder[];
 
   @OneToMany(() => Wishlist, (wishlist) => wishlist.order)
-  wishlists!: Wishlist;
+  wishlists!: Wishlist[];
 }
