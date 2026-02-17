@@ -84,16 +84,6 @@ describe('WishlistService', () => {
     });
   });
 
-  describe('findByUser', () => {
-    it('should return a list of wishlist items for a user', async () => {
-      const expectedResult: Wishlist[] = [mockWishlist];
-      repository.find?.mockResolvedValue(expectedResult);
-
-      const result = await service.findByUser(mockUserId);
-      expect(result).toEqual(expectedResult);
-    });
-  });
-
   describe('updateRating', () => {
     const updateDto: UpdateWishlistDto = { rating: 4 };
 

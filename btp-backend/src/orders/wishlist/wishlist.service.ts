@@ -31,13 +31,6 @@ export class WishlistService {
     return this.wishlistRepository.save(wishlistItem);
   }
 
-  async findByUser(userId: string): Promise<Wishlist[]> {
-    return this.wishlistRepository.find({
-      where: { user: { id: userId } },
-      relations: ['food'],
-    });
-  }
-
   async findByOrder(orderId: string): Promise<Wishlist[]> {
     return this.wishlistRepository.find({
       where: { order: { id: orderId } },

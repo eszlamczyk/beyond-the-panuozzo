@@ -27,11 +27,6 @@ export class WishlistController {
     return this.wishlistService.findByOrder(orderId);
   }
 
-  @Get('user/:userId')
-  findByUser(@Param('userId') userId: string) {
-    return this.wishlistService.findByUser(userId);
-  }
-
   @Patch(':id')
   update(
     @Param('id') id: string,

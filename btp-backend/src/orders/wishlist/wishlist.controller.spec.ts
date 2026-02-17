@@ -8,7 +8,6 @@ import type { Wishlist } from './wishlist.entity';
 
 const mockWishlistService = {
   create: jest.fn(),
-  findByUser: jest.fn(),
   updateRating: jest.fn(),
   remove: jest.fn(),
 };
@@ -54,26 +53,6 @@ describe('WishlistController', () => {
 
       const result = await controller.create(createDto);
       expect(createSpy).toHaveBeenCalledWith(createDto);
-      expect(result).toEqual(expectedResult);
-    });
-  });
-
-  describe('findByUser', () => {
-    it('should get wishlist items for a user', async () => {
-      const expectedResult = [
-        {
-          id: mockWishlistId,
-          userId: mockUserId,
-          foodId: mockFoodId,
-          rating: 5,
-        },
-      ];
-      const findSpy = jest
-        .spyOn(service, 'findByUser')
-        .mockResolvedValue(expectedResult as unknown as Wishlist[]);
-
-      const result = await controller.findByUser(mockUserId);
-      expect(findSpy).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual(expectedResult);
     });
   });
