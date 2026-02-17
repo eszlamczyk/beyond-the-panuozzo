@@ -34,6 +34,6 @@ import { FoodsModule } from './foods/foods.module';
     UsersModule,
     OrdersModule,
     FoodsModule,
-  ]
+  ],
 })
 export class AppModule {}
