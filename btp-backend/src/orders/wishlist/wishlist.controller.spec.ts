@@ -35,6 +35,10 @@ describe('WishlistController', () => {
     service = module.get<WishlistService>(WishlistService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

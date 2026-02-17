@@ -35,6 +35,10 @@ describe('FoodTypesController', () => {
     service = module.get<FoodTypesService>(FoodTypesService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
