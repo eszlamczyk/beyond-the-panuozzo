@@ -14,13 +14,6 @@ export class WishlistService {
 
   async create(createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
     const { rating, userId, foodId, orderId, size } = createWishlistDto;
-    const existingWishlistItem = await this.wishlistRepository.findOne({
-      where: { user: { id: userId }, food: { id: foodId } },
-    });
-
-    if (existingWishlistItem) {
-      return this.updateRating(existingWishlistItem.id, { rating });
-    }
 
     const wishlistItem = this.wishlistRepository.create({
       rating,

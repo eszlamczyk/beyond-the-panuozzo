@@ -64,26 +64,26 @@ describe('WishlistService', () => {
     };
 
     it('should create a new wishlist item', async () => {
-      repository.findOne?.mockResolvedValue(null);
       repository.create?.mockReturnValue(mockWishlist);
       repository.save?.mockResolvedValue(mockWishlist);
 
       const result = await service.create(createDto);
 
+      expect(repository.create).toHaveBeenCalled();
+      expect(repository.save).toHaveBeenCalledWith(mockWishlist);
       expect(result).toEqual(mockWishlist);
     });
 
-    it('should update an existing wishlist item', async () => {
-      repository.findOne?.mockResolvedValue(mockWishlist);
-
-      const updateSpy = jest.spyOn(service, 'updateRating').mockResolvedValue({
-        ...mockWishlist,
-        rating: createDto.rating,
-      });
+    it('should allow duplicate wishlist items for the same user and food', async () => {
+      const duplicateWishlist = { ...mockWishlist, id: 'wishlist-uuid-dup' };
+      repository.create?.mockReturnValue(duplicateWishlist);
+      repository.save?.mockResolvedValue(duplicateWishlist);
 
       const result = await service.create(createDto);
-      expect(updateSpy).toHaveBeenCalled();
-      expect(result.rating).toBe(createDto.rating);
+
+      expect(repository.create).toHaveBeenCalled();
+      expect(repository.save).toHaveBeenCalledWith(duplicateWishlist);
+      expect(result).toEqual(duplicateWishlist);
     });
   });
 
