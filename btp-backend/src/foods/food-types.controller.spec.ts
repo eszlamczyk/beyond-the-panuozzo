@@ -2,7 +2,7 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { FoodTypesController } from './food-types.controller';
 import { FoodTypesService } from './food-types.service';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import type { FoodType } from './food-type.entity';
 
 describe('FoodTypesController', () => {
@@ -59,8 +59,8 @@ describe('FoodTypesController', () => {
       .mockRejectedValue(
         new NotFoundException(`FoodType with ID "${mockFoodTypeId}" not found`),
       );
-    const err = await controller.findOne(mockFoodTypeId).catch((e) => e);
-    expect(err).toBeInstanceOf(NotFoundException);
-    expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
+    await expect(controller.findOne(mockFoodTypeId)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

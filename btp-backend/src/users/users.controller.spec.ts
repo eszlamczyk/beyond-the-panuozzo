@@ -2,7 +2,7 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import type { User } from './users.entity';
 
 const mockUsersService = {
@@ -61,9 +61,9 @@ describe('UsersController', () => {
         .mockRejectedValue(
           new NotFoundException(`User with ID "${mockUserId}" not found`),
         );
-      const err = await controller.findOne(mockUserId).catch((e) => e);
-      expect(err).toBeInstanceOf(NotFoundException);
-      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
+      await expect(controller.findOne(mockUserId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

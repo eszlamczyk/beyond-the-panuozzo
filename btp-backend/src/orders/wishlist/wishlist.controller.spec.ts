@@ -4,7 +4,7 @@ import { WishlistController } from './wishlist.controller';
 import { WishlistService } from './wishlist.service';
 import type { CreateWishlistDto } from './dto/create-wishlist.dto';
 import type { UpdateWishlistDto } from './dto/update-wishlist.dto';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import type { Wishlist } from './wishlist.entity';
 import { PanuozzoSize } from '../panuozzo-size.enum';
 
@@ -102,9 +102,9 @@ describe('WishlistController', () => {
             `Wishlist item with ID "${mockWishlistId}" not found`,
           ),
         );
-      const err = await controller.remove(mockWishlistId).catch((e) => e);
-      expect(err).toBeInstanceOf(NotFoundException);
-      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
+      await expect(controller.remove(mockWishlistId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -118,11 +118,9 @@ describe('WishlistController', () => {
             `Wishlist item with ID "${mockWishlistId}" not found`,
           ),
         );
-      const err = await controller
-        .update(mockWishlistId, updateDto)
-        .catch((e) => e);
-      expect(err).toBeInstanceOf(NotFoundException);
-      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
+      await expect(
+        controller.update(mockWishlistId, updateDto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
