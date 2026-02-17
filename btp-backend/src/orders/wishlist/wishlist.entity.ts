@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('wishlist')
 @Check(`"rating" >= 1 AND "rating" <= 5`)
 export class Wishlist {
   @PrimaryGeneratedColumn('uuid')
