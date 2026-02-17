@@ -25,7 +25,9 @@ export class OrderResponseDto {
     dto.status = order.status;
     dto.managerId = order.managerId;
     dto.managerName = order.managerName;
-    dto.items = order.items.map((item) => OrderItemResponseDto.fromDomain(item));
+    dto.items = order.items.map((item) =>
+      OrderItemResponseDto.fromDomain(item),
+    );
     return dto;
   }
 }
