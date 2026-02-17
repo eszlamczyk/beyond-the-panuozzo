@@ -5,14 +5,13 @@ import { UsersModule } from '../users/users.module';
 import { Order } from './order.entity';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
-import { UserOrder } from './user-order.entity';
 import { Wishlist } from './wishlist/wishlist.entity';
 import { WishlistController } from './wishlist/wishlist.controller';
 import { WishlistService } from './wishlist/wishlist.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, UserOrder, Wishlist]),
+    TypeOrmModule.forFeature([Order, Wishlist]),
     FoodsModule,
     UsersModule,
   ],
