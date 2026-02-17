@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsUUID, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsUUID, Max, Min } from 'class-validator';
+import { PanuozzoSize } from '../../panuozzo-size.enum';
 
 export class CreateWishlistDto {
   @ApiProperty({
@@ -22,4 +23,12 @@ export class CreateWishlistDto {
   @ApiProperty({ description: 'ID of the order' })
   @IsUUID()
   orderId!: string;
+
+  @ApiProperty({
+    description: 'Panuozzo size',
+    example: 'half',
+    enum: PanuozzoSize,
+  })
+  @IsEnum(PanuozzoSize)
+  size!: PanuozzoSize;
 }

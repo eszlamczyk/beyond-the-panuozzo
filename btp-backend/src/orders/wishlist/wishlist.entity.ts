@@ -1,5 +1,6 @@
 import { Food } from '../../foods/food.entity';
 import { Order } from '../order.entity';
+import { PanuozzoSize } from '../panuozzo-size.enum';
 import { User } from '../../users/users.entity';
 import {
   Check,
@@ -26,4 +27,7 @@ export class Wishlist {
 
   @ManyToOne(() => Order, (order) => order.wishlists)
   order!: Order;
+
+  @Column({ type: 'varchar' })
+  size!: PanuozzoSize;
 }

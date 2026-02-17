@@ -1,7 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../users/users.entity';
 import { Order } from './order.entity';
 import { Food } from '../foods/food.entity';
+import { PanuozzoSize } from './panuozzo-size.enum';
 
 @Entity('user_orders')
 export class UserOrder {
@@ -17,4 +24,7 @@ export class UserOrder {
   @ManyToOne(() => Food)
   @JoinColumn({ name: 'food_id' })
   food!: Food;
+
+  @Column({ type: 'varchar' })
+  size!: PanuozzoSize;
 }
