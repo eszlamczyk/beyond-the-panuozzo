@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WishlistModule } from './wishlist/wishlist.module';
+
 import { UsersModule } from './users/users.module';
 import { OrdersModule } from './orders/orders.module';
 import { FoodsModule } from './foods/foods.module';
@@ -36,7 +36,6 @@ import { FoodsModule } from './foods/foods.module';
     UsersModule,
     OrdersModule,
     FoodsModule,
-    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
