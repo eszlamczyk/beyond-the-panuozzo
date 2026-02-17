@@ -19,13 +19,13 @@ export class Wishlist {
   @Column('int')
   rating!: number;
 
-  @ManyToOne(() => Food, (food) => food.wishlists)
+  @ManyToOne(() => Food, (food) => food.wishlists, { nullable: false })
   food!: Food;
 
-  @ManyToOne(() => User, (user) => user.wishlists)
+  @ManyToOne(() => User, (user) => user.wishlists, { nullable: false })
   user!: User;
 
-  @ManyToOne(() => Order, (order) => order.wishlists)
+  @ManyToOne(() => Order, (order) => order.wishlists, { nullable: false })
   order!: Order;
 
   @Column({ type: 'varchar' })
