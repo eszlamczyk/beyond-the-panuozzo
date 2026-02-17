@@ -82,6 +82,20 @@ describe('WishlistController', () => {
       expect(updateSpy).toHaveBeenCalledWith(mockWishlistId, updateDto);
       expect(result).toEqual(expectedResult);
     });
+
+    it('should throw NotFoundException (404) when item not found', async () => {
+      const updateDto: UpdateWishlistDto = { rating: 4 };
+      jest
+        .spyOn(service, 'updateRating')
+        .mockRejectedValue(
+          new NotFoundException(
+            `Wishlist item with ID "${mockWishlistId}" not found`,
+          ),
+        );
+      await expect(
+        controller.update(mockWishlistId, updateDto),
+      ).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('remove', () => {
@@ -105,22 +119,6 @@ describe('WishlistController', () => {
       await expect(controller.remove(mockWishlistId)).rejects.toThrow(
         NotFoundException,
       );
-    });
-  });
-
-  describe('update', () => {
-    it('should throw NotFoundException (404) when item not found', async () => {
-      const updateDto: UpdateWishlistDto = { rating: 4 };
-      jest
-        .spyOn(service, 'updateRating')
-        .mockRejectedValue(
-          new NotFoundException(
-            `Wishlist item with ID "${mockWishlistId}" not found`,
-          ),
-        );
-      await expect(
-        controller.update(mockWishlistId, updateDto),
-      ).rejects.toThrow(NotFoundException);
     });
   });
 });
