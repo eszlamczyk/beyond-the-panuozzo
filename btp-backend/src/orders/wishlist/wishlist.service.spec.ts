@@ -7,6 +7,7 @@ import type { ObjectLiteral, Repository, DeleteResult } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import type { CreateWishlistDto } from './dto/create-wishlist.dto';
 import type { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { PanuozzoSize } from '../panuozzo-size.enum';
 
 const mockWishlistRepository = (): MockRepository<Wishlist> => ({
   create: jest.fn(),
@@ -58,6 +59,8 @@ describe('WishlistService', () => {
       userId: mockUserId,
       foodId: mockFoodId,
       rating: 5,
+      orderId: 'order-uuid-101',
+      size: PanuozzoSize.HALF,
     };
 
     it('should create a new wishlist item', async () => {

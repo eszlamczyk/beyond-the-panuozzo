@@ -5,6 +5,7 @@ import { WishlistService } from './wishlist.service';
 import type { CreateWishlistDto } from './dto/create-wishlist.dto';
 import type { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import type { Wishlist } from './wishlist.entity';
+import { PanuozzoSize } from '../panuozzo-size.enum';
 
 const mockWishlistService = {
   create: jest.fn(),
@@ -49,6 +50,8 @@ describe('WishlistController', () => {
         userId: mockUserId,
         foodId: mockFoodId,
         rating: 5,
+        orderId: 'order-uuid-101',
+        size: PanuozzoSize.HALF,
       };
       const expectedResult = { id: mockWishlistId, ...createDto };
       const createSpy = jest
