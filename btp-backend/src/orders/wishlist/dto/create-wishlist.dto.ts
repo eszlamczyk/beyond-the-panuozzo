@@ -18,4 +18,8 @@ export class CreateWishlistDto {
   @ApiProperty({ description: 'ID of the user' })
   @IsUUID()
   userId!: string;
+
+  @ApiProperty({ description: 'ID of the order' })
+  @IsUUID()
+  orderId!: string;
 }

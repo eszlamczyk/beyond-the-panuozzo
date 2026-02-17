@@ -13,7 +13,7 @@ export class WishlistService {
   ) {}
 
   async create(createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
-    const { rating, userId, foodId } = createWishlistDto;
+    const { rating, userId, foodId, orderId } = createWishlistDto;
     const existingWishlistItem = await this.wishlistRepository.findOne({
       where: { user: { id: userId }, food: { id: foodId } },
     });
@@ -26,6 +26,7 @@ export class WishlistService {
       rating,
       user: { id: userId },
       food: { id: foodId },
+      order: { id: orderId },
     });
 
     return this.wishlistRepository.save(wishlistItem);
