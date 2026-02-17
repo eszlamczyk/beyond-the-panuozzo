@@ -4,6 +4,7 @@ import { WishlistController } from './wishlist.controller';
 import { WishlistService } from './wishlist.service';
 import type { CreateWishlistDto } from './dto/create-wishlist.dto';
 import type { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import type { Wishlist } from './wishlist.entity';
 import { PanuozzoSize } from '../panuozzo-size.enum';
 
@@ -91,6 +92,27 @@ describe('WishlistController', () => {
       const result = await controller.remove(mockWishlistId);
       expect(removeSpy).toHaveBeenCalledWith(mockWishlistId);
       expect(result).toBeUndefined();
+    });
+
+    it('should throw NotFoundException (404) when item not found', async () => {
+      jest.spyOn(service, 'remove').mockRejectedValue(
+        new NotFoundException(`Wishlist item with ID "${mockWishlistId}" not found`),
+      );
+      const err = await controller.remove(mockWishlistId).catch((e) => e);
+      expect(err).toBeInstanceOf(NotFoundException);
+      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('update', () => {
+    it('should throw NotFoundException (404) when item not found', async () => {
+      const updateDto: UpdateWishlistDto = { rating: 4 };
+      jest.spyOn(service, 'updateRating').mockRejectedValue(
+        new NotFoundException(`Wishlist item with ID "${mockWishlistId}" not found`),
+      );
+      const err = await controller.update(mockWishlistId, updateDto).catch((e) => e);
+      expect(err).toBeInstanceOf(NotFoundException);
+      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
     });
   });
 });

@@ -2,6 +2,7 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import type { Order } from './order.entity';
 import { OrderStatus } from './order-status.enum';
 
@@ -47,5 +48,14 @@ describe('OrdersController', () => {
     const findSpy = jest.spyOn(service, 'findOne').mockResolvedValue(mockOrder);
     await controller.findOne('id');
     expect(findSpy).toHaveBeenCalledWith('id');
+  });
+
+  it('should throw NotFoundException (404) when order not found', async () => {
+    jest.spyOn(service, 'findOne').mockRejectedValue(
+      new NotFoundException(`Order with ID "${mockOrderId}" not found`),
+    );
+    const err = await controller.findOne(mockOrderId).catch((e) => e);
+    expect(err).toBeInstanceOf(NotFoundException);
+    expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
   });
 });

@@ -2,6 +2,7 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import type { User } from './users.entity';
 
 const mockUsersService = {
@@ -52,6 +53,15 @@ describe('UsersController', () => {
       const result = await controller.findOne(mockUserId);
       expect(findSpy).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual(mockUser);
+    });
+
+    it('should throw NotFoundException (404) when user not found', async () => {
+      jest.spyOn(service, 'findOne').mockRejectedValue(
+        new NotFoundException(`User with ID "${mockUserId}" not found`),
+      );
+      const err = await controller.findOne(mockUserId).catch((e) => e);
+      expect(err).toBeInstanceOf(NotFoundException);
+      expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
     });
   });
 });
