@@ -95,9 +95,13 @@ describe('WishlistController', () => {
     });
 
     it('should throw NotFoundException (404) when item not found', async () => {
-      jest.spyOn(service, 'remove').mockRejectedValue(
-        new NotFoundException(`Wishlist item with ID "${mockWishlistId}" not found`),
-      );
+      jest
+        .spyOn(service, 'remove')
+        .mockRejectedValue(
+          new NotFoundException(
+            `Wishlist item with ID "${mockWishlistId}" not found`,
+          ),
+        );
       const err = await controller.remove(mockWishlistId).catch((e) => e);
       expect(err).toBeInstanceOf(NotFoundException);
       expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
@@ -107,10 +111,16 @@ describe('WishlistController', () => {
   describe('update', () => {
     it('should throw NotFoundException (404) when item not found', async () => {
       const updateDto: UpdateWishlistDto = { rating: 4 };
-      jest.spyOn(service, 'updateRating').mockRejectedValue(
-        new NotFoundException(`Wishlist item with ID "${mockWishlistId}" not found`),
-      );
-      const err = await controller.update(mockWishlistId, updateDto).catch((e) => e);
+      jest
+        .spyOn(service, 'updateRating')
+        .mockRejectedValue(
+          new NotFoundException(
+            `Wishlist item with ID "${mockWishlistId}" not found`,
+          ),
+        );
+      const err = await controller
+        .update(mockWishlistId, updateDto)
+        .catch((e) => e);
       expect(err).toBeInstanceOf(NotFoundException);
       expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
     });

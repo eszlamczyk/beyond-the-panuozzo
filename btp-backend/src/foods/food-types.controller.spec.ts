@@ -54,9 +54,11 @@ describe('FoodTypesController', () => {
   });
 
   it('should throw NotFoundException (404) when food type not found', async () => {
-    jest.spyOn(service, 'findOne').mockRejectedValue(
-      new NotFoundException(`FoodType with ID "${mockFoodTypeId}" not found`),
-    );
+    jest
+      .spyOn(service, 'findOne')
+      .mockRejectedValue(
+        new NotFoundException(`FoodType with ID "${mockFoodTypeId}" not found`),
+      );
     const err = await controller.findOne(mockFoodTypeId).catch((e) => e);
     expect(err).toBeInstanceOf(NotFoundException);
     expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);

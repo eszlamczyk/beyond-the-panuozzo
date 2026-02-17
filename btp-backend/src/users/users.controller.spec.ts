@@ -56,9 +56,11 @@ describe('UsersController', () => {
     });
 
     it('should throw NotFoundException (404) when user not found', async () => {
-      jest.spyOn(service, 'findOne').mockRejectedValue(
-        new NotFoundException(`User with ID "${mockUserId}" not found`),
-      );
+      jest
+        .spyOn(service, 'findOne')
+        .mockRejectedValue(
+          new NotFoundException(`User with ID "${mockUserId}" not found`),
+        );
       const err = await controller.findOne(mockUserId).catch((e) => e);
       expect(err).toBeInstanceOf(NotFoundException);
       expect(err.getStatus()).toBe(HttpStatus.NOT_FOUND);
