@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Actor } from '../../auth/authorization/actor';
 import { OrderStatus } from '../order-status.enum';
+import type { PanuozzoSize } from '../panuozzo-size.enum';
 import { OrdersService } from './orders.service';
 import { WishlistItem } from './wishlist.model';
 import { WishlistRepositoryPort } from './wishlist-repository.port';
@@ -13,7 +14,7 @@ export interface CreateWishlistInput {
   rating: number;
   foodId: string;
   orderId: string;
-  size: string;
+  size: PanuozzoSize;
 }
 
 export interface UpdateWishlistInput {
@@ -38,7 +39,7 @@ export class WishlistService {
       foodId: input.foodId,
       userId: actor.userId,
       orderId: input.orderId,
-      size: input.size as WishlistItem['size'],
+      size: input.size,
     });
   }
 
