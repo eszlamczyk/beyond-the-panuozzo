@@ -1,8 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Authenticated } from '../../authentication/authenticated.decorator';
 import { OrdersService } from '../domain/orders.service';
 import { OrderResponseDto } from './dto/order-response.dto';
 
+@Authenticated()
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {

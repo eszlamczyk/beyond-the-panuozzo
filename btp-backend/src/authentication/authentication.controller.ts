@@ -15,10 +15,10 @@ import type { ConfigType } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 import { authorizationConfig } from '../authorization/authorization.config';
+import { Authenticated } from './authenticated.decorator';
 import { AuthenticationService } from './authentication.service';
 import { GoogleAuthenticationGuard } from './google-authentication.guard';
 import { googleUserSchema } from './google-user.schema';
-import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { jwtPayloadSchema } from './jwt-payload.schema';
 import { RefreshTokenService } from './refresh-token.service';
 
@@ -133,8 +133,8 @@ export class AuthenticationController {
   }
 
   /** Revokes all refresh tokens for the authenticated user. */
+  @Authenticated()
   @Post('sign-out')
-  @UseGuards(JwtAuthenticationGuard)
   async signOut(@Req() req: Request): Promise<{ ok: true }> {
     const result = jwtPayloadSchema.safeParse(req.user);
     if (!result.success) {

@@ -22,4 +22,12 @@ export class UsersTypeOrmRepository extends UsersRepositoryPort {
     }
     return UserMapper.toDomain(user);
   }
+
+  async findByEmail(email: string): Promise<UserModel> {
+    const user = await this.usersRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException(`User with email "${email}" not found`);
+    }
+    return UserMapper.toDomain(user);
+  }
 }

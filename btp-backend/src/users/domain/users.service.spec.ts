@@ -7,6 +7,7 @@ import type { UserModel } from './user.model';
 
 const mockUsersRepository: jest.Mocked<UsersRepositoryPort> = {
   findOne: jest.fn(),
+  findByEmail: jest.fn(),
 };
 
 describe('UsersService', () => {

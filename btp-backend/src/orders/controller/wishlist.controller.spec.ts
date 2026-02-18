@@ -1,5 +1,9 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../authorization/email-domain.guard';
+import { Actor } from '../../domain/actor';
+import { UsersService } from '../../users/domain/users.service';
 import { WishlistController } from './wishlist.controller';
 import { WishlistService } from '../domain/wishlist.service';
 import type { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
@@ -7,6 +11,7 @@ import type { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto
 import { NotFoundException } from '@nestjs/common';
 import { PanuozzoSize } from '../panuozzo-size.enum';
 import type { WishlistItem } from '../domain/wishlist.model';
+import type { Request } from 'express';
 
 const mockWishlistService = {
   create: jest.fn(),
@@ -15,15 +20,31 @@ const mockWishlistService = {
   remove: jest.fn(),
 };
 
+const mockUsersService = {
+  findByEmail: jest.fn(),
+};
+
+const mockUserId = 'user-uuid-123';
+const mockFoodId = 'food-uuid-456';
+const mockWishlistId = 'wishlist-uuid-789';
+
+const mockReq = {
+  user: { sub: 'google-id-123', email: 'alice@example.com', name: 'Alice' },
+} as unknown as Request;
+
 describe('WishlistController', () => {
   let controller: WishlistController;
   let service: WishlistService;
 
-  const mockUserId = 'user-uuid-123';
-  const mockFoodId = 'food-uuid-456';
-  const mockWishlistId = 'wishlist-uuid-789';
-
   beforeEach(async () => {
+    mockUsersService.findByEmail.mockResolvedValue({
+      id: mockUserId,
+      firstName: 'Alice',
+      lastName: 'Smith',
+      email: 'alice@example.com',
+      phoneNumber: '+15551234567',
+    });
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [WishlistController],
       providers: [
@@ -31,8 +52,17 @@ describe('WishlistController', () => {
           provide: WishlistService,
           useValue: mockWishlistService,
         },
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthenticationGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(EmailDomainGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<WishlistController>(WishlistController);
     service = module.get<WishlistService>(WishlistService);
@@ -47,10 +77,9 @@ describe('WishlistController', () => {
   });
 
   describe('create', () => {
-    it('should create a wishlist item and return a response DTO', async () => {
+    it('should create a wishlist item using the authenticated user ID', async () => {
       const orderId = 'order-uuid-101';
       const requestDto: CreateWishlistRequestDto = {
-        userId: mockUserId,
         foodId: mockFoodId,
         rating: 5,
         size: PanuozzoSize.HALF,
@@ -67,9 +96,12 @@ describe('WishlistController', () => {
         .spyOn(service, 'create')
         .mockResolvedValue(domainItem);
 
-      const result = await controller.create(orderId, requestDto);
+      const result = await controller.create(orderId, requestDto, mockReq);
 
-      expect(createSpy).toHaveBeenCalledWith({ ...requestDto, orderId });
+      expect(createSpy).toHaveBeenCalledWith(
+        { ...requestDto, orderId },
+        expect.any(Actor),
+      );
       expect(result).toEqual({
         id: mockWishlistId,
         rating: 5,
@@ -122,9 +154,17 @@ describe('WishlistController', () => {
         .spyOn(service, 'updateRating')
         .mockResolvedValue(domainItem);
 
-      const result = await controller.update(mockWishlistId, updateDto);
+      const result = await controller.update(
+        mockWishlistId,
+        updateDto,
+        mockReq,
+      );
 
-      expect(updateSpy).toHaveBeenCalledWith(mockWishlistId, updateDto);
+      expect(updateSpy).toHaveBeenCalledWith(
+        mockWishlistId,
+        updateDto,
+        expect.any(Actor),
+      );
       expect(result.rating).toBe(4);
     });
 
@@ -138,7 +178,7 @@ describe('WishlistController', () => {
           ),
         );
       await expect(
-        controller.update(mockWishlistId, updateDto),
+        controller.update(mockWishlistId, updateDto, mockReq),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -148,8 +188,8 @@ describe('WishlistController', () => {
       const removeSpy = jest
         .spyOn(service, 'remove')
         .mockResolvedValue(undefined);
-      const result = await controller.remove(mockWishlistId);
-      expect(removeSpy).toHaveBeenCalledWith(mockWishlistId);
+      const result = await controller.remove(mockWishlistId, mockReq);
+      expect(removeSpy).toHaveBeenCalledWith(mockWishlistId, expect.any(Actor));
       expect(result).toBeUndefined();
     });
 
@@ -161,7 +201,7 @@ describe('WishlistController', () => {
             `Wishlist item with ID "${mockWishlistId}" not found`,
           ),
         );
-      await expect(controller.remove(mockWishlistId)).rejects.toThrow(
+      await expect(controller.remove(mockWishlistId, mockReq)).rejects.toThrow(
         NotFoundException,
       );
     });

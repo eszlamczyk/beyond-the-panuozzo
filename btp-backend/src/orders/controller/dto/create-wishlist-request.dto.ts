@@ -16,10 +16,6 @@ export class CreateWishlistRequestDto {
   @IsUUID()
   foodId!: string;
 
-  @ApiProperty({ description: 'ID of the user' })
-  @IsUUID()
-  userId!: string;
-
   @ApiProperty({
     description: 'Panuozzo size',
     example: 'half',

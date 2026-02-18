@@ -1,5 +1,7 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../authorization/email-domain.guard';
 import { UsersController } from './users.controller';
 import { UsersService } from '../domain/users.service';
 import { NotFoundException } from '@nestjs/common';
@@ -31,7 +33,12 @@ describe('UsersController', () => {
           useValue: mockUsersService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthenticationGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(EmailDomainGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);

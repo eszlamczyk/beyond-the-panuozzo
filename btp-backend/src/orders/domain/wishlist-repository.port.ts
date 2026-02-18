@@ -5,6 +5,8 @@ export abstract class WishlistRepositoryPort {
     item: Omit<WishlistItem, 'id' | 'foodName'>,
   ): Promise<WishlistItem>;
 
+  abstract findOne(id: string): Promise<WishlistItem>;
+
   abstract findByOrder(orderId: string): Promise<WishlistItem[]>;
 
   abstract updateRating(id: string, rating: number): Promise<WishlistItem>;

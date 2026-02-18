@@ -1,8 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Authenticated } from '../../authentication/authenticated.decorator';
 import { FoodsService } from '../domain/foods.service';
 import { FoodResponseDto } from './dto/food-response.dto';
 
+@Authenticated()
 @ApiTags('Foods')
 @Controller('foods')
 export class FoodsController {

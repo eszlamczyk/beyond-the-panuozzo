@@ -30,6 +30,17 @@ export class WishlistTypeOrmRepository extends WishlistRepositoryPort {
     return WishlistMapper.toDomain(saved);
   }
 
+  async findOne(id: string): Promise<WishlistItem> {
+    const entity = await this.repo.findOne({
+      where: { id },
+      relations: ['food', 'user', 'order'],
+    });
+    if (!entity) {
+      throw new NotFoundException(`Wishlist item with ID "${id}" not found`);
+    }
+    return WishlistMapper.toDomain(entity);
+  }
+
   async findByOrder(orderId: string): Promise<WishlistItem[]> {
     const entities = await this.repo.find({
       where: { order: { id: orderId } },

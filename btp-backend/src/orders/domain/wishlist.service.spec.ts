@@ -2,12 +2,14 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { WishlistService } from './wishlist.service';
 import { WishlistRepositoryPort } from './wishlist-repository.port';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PanuozzoSize } from '../panuozzo-size.enum';
 import type { WishlistItem } from './wishlist.model';
+import { Actor } from '../../domain/actor';
 
 const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
   create: jest.fn(),
+  findOne: jest.fn(),
   findByOrder: jest.fn(),
   updateRating: jest.fn(),
   remove: jest.fn(),
@@ -19,6 +21,8 @@ describe('WishlistService', () => {
   const mockUserId = 'user-uuid-123';
   const mockFoodId = 'food-uuid-456';
   const mockWishlistId = 'wishlist-uuid-789';
+  const owner = new Actor(mockUserId);
+  const otherUser = new Actor('other-user-id');
 
   const mockWishlistItem: WishlistItem = {
     id: mockWishlistId,
@@ -49,17 +53,16 @@ describe('WishlistService', () => {
 
   describe('create', () => {
     const createInput = {
-      userId: mockUserId,
       foodId: mockFoodId,
       rating: 5,
       orderId: 'order-uuid-101',
       size: PanuozzoSize.HALF,
     };
 
-    it('should create a new wishlist item', async () => {
+    it('should create a new wishlist item for the actor', async () => {
       mockRepository.create.mockResolvedValue(mockWishlistItem);
 
-      const result = await service.create(createInput);
+      const result = await service.create(createInput, owner);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.create).toHaveBeenCalledWith({
@@ -76,7 +79,7 @@ describe('WishlistService', () => {
       const duplicateItem = { ...mockWishlistItem, id: 'wishlist-uuid-dup' };
       mockRepository.create.mockResolvedValue(duplicateItem);
 
-      const result = await service.create(createInput);
+      const result = await service.create(createInput, owner);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.create).toHaveBeenCalled();
@@ -97,11 +100,16 @@ describe('WishlistService', () => {
   });
 
   describe('updateRating', () => {
-    it('should update the rating of a wishlist item', async () => {
+    it('should update the rating of a wishlist item owned by the actor', async () => {
       const updatedItem = { ...mockWishlistItem, rating: 4 };
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
       mockRepository.updateRating.mockResolvedValue(updatedItem);
 
-      const result = await service.updateRating(mockWishlistId, { rating: 4 });
+      const result = await service.updateRating(
+        mockWishlistId,
+        { rating: 4 },
+        owner,
+      );
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.updateRating).toHaveBeenCalledWith(
@@ -111,37 +119,54 @@ describe('WishlistService', () => {
       expect(result.rating).toBe(4);
     });
 
+    it('should throw ForbiddenException when actor does not own the item', async () => {
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+
+      await expect(
+        service.updateRating(mockWishlistId, { rating: 4 }, otherUser),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
     it('should propagate NotFoundException from repository', async () => {
-      mockRepository.updateRating.mockRejectedValue(
+      mockRepository.findOne.mockRejectedValue(
         new NotFoundException(
           `Wishlist item with ID "${mockWishlistId}" not found`,
         ),
       );
 
       await expect(
-        service.updateRating(mockWishlistId, { rating: 4 }),
+        service.updateRating(mockWishlistId, { rating: 4 }, owner),
       ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
-    it('should remove a wishlist item', async () => {
+    it('should remove a wishlist item owned by the actor', async () => {
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
       mockRepository.remove.mockResolvedValue(undefined);
 
-      await service.remove(mockWishlistId);
+      await service.remove(mockWishlistId, owner);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.remove).toHaveBeenCalledWith(mockWishlistId);
     });
 
+    it('should throw ForbiddenException when actor does not own the item', async () => {
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+
+      await expect(service.remove(mockWishlistId, otherUser)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
     it('should propagate NotFoundException from repository', async () => {
-      mockRepository.remove.mockRejectedValue(
+      mockRepository.findOne.mockRejectedValue(
         new NotFoundException(
           `Wishlist item with ID "${mockWishlistId}" not found`,
         ),
       );
 
-      await expect(service.remove(mockWishlistId)).rejects.toThrow(
+      await expect(service.remove(mockWishlistId, owner)).rejects.toThrow(
         NotFoundException,
       );
     });

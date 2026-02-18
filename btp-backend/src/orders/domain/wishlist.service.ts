@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Actor } from '../../domain/actor';
 import { WishlistItem } from './wishlist.model';
 import { WishlistRepositoryPort } from './wishlist-repository.port';
 
 export interface CreateWishlistInput {
   rating: number;
   foodId: string;
-  userId: string;
   orderId: string;
   size: string;
 }
@@ -18,11 +18,14 @@ export interface UpdateWishlistInput {
 export class WishlistService {
   constructor(private readonly wishlistRepository: WishlistRepositoryPort) {}
 
-  async create(input: CreateWishlistInput): Promise<WishlistItem> {
+  async create(
+    input: CreateWishlistInput,
+    actor: Actor,
+  ): Promise<WishlistItem> {
     return this.wishlistRepository.create({
       rating: input.rating,
       foodId: input.foodId,
-      userId: input.userId,
+      userId: actor.userId,
       orderId: input.orderId,
       size: input.size as WishlistItem['size'],
     });
@@ -35,11 +38,24 @@ export class WishlistService {
   async updateRating(
     id: string,
     input: UpdateWishlistInput,
+    actor: Actor,
   ): Promise<WishlistItem> {
+    const item = await this.wishlistRepository.findOne(id);
+    if (!actor.isOwnerOf(item)) {
+      throw new ForbiddenException(
+        'You do not have permission to modify this wishlist item.',
+      );
+    }
     return this.wishlistRepository.updateRating(id, input.rating);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, actor: Actor): Promise<void> {
+    const item = await this.wishlistRepository.findOne(id);
+    if (!actor.isOwnerOf(item)) {
+      throw new ForbiddenException(
+        'You do not have permission to modify this wishlist item.',
+      );
+    }
     return this.wishlistRepository.remove(id);
   }
 }

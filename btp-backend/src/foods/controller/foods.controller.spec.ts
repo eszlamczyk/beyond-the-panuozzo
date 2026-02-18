@@ -1,5 +1,7 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../authorization/email-domain.guard';
 import { FoodsController } from './foods.controller';
 import { FoodsService } from '../domain/foods.service';
 import { NotFoundException } from '@nestjs/common';
@@ -22,7 +24,12 @@ describe('FoodsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FoodsController],
       providers: [{ provide: FoodsService, useValue: mockService }],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthenticationGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(EmailDomainGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
     controller = module.get<FoodsController>(FoodsController);
     service = module.get<FoodsService>(FoodsService);
   });
