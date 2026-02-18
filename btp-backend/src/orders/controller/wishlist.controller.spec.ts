@@ -48,11 +48,11 @@ describe('WishlistController', () => {
 
   describe('create', () => {
     it('should create a wishlist item and return a response DTO', async () => {
+      const orderId = 'order-uuid-101';
       const requestDto: CreateWishlistRequestDto = {
         userId: mockUserId,
         foodId: mockFoodId,
         rating: 5,
-        orderId: 'order-uuid-101',
         size: PanuozzoSize.HALF,
       };
       const domainItem: WishlistItem = {
@@ -61,15 +61,15 @@ describe('WishlistController', () => {
         size: PanuozzoSize.HALF,
         userId: mockUserId,
         foodId: mockFoodId,
-        orderId: 'order-uuid-101',
+        orderId,
       };
       const createSpy = jest
         .spyOn(service, 'create')
         .mockResolvedValue(domainItem);
 
-      const result = await controller.create(requestDto);
+      const result = await controller.create(orderId, requestDto);
 
-      expect(createSpy).toHaveBeenCalledWith(requestDto);
+      expect(createSpy).toHaveBeenCalledWith({ ...requestDto, orderId });
       expect(result).toEqual({
         id: mockWishlistId,
         rating: 5,
@@ -77,7 +77,7 @@ describe('WishlistController', () => {
         userId: mockUserId,
         foodId: mockFoodId,
         foodName: undefined,
-        orderId: 'order-uuid-101',
+        orderId,
       });
     });
   });

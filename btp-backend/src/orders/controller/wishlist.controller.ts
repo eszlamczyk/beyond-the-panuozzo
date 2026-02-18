@@ -9,24 +9,27 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
 import { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto';
 import { WishlistResponseDto } from './dto/wishlist-response.dto';
 import { WishlistService } from '../domain/wishlist.service';
 
-@Controller('wishlist')
+@ApiTags('Orders > Wishlists')
+@Controller('orders/:orderId/wishlists')
 export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 
   @Post()
   async create(
+    @Param('orderId') orderId: string,
     @Body() dto: CreateWishlistRequestDto,
   ): Promise<WishlistResponseDto> {
-    const item = await this.wishlistService.create(dto);
+    const item = await this.wishlistService.create({ ...dto, orderId });
     return WishlistResponseDto.fromDomain(item);
   }
 
-  @Get('order/:orderId')
+  @Get()
   async findByOrder(
     @Param('orderId') orderId: string,
   ): Promise<WishlistResponseDto[]> {

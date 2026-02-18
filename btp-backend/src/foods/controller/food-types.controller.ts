@@ -1,8 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FoodTypesService } from '../domain/food-types.service';
 import { FoodTypeResponseDto } from './dto/food-type-response.dto';
 
-@Controller('food-types')
+@ApiTags('Foods > Types')
+@Controller('foods/types')
 export class FoodTypesController {
   constructor(private readonly foodTypesService: FoodTypesService) {}
 

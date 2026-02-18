@@ -20,10 +20,6 @@ export class CreateWishlistRequestDto {
   @IsUUID()
   userId!: string;
 
-  @ApiProperty({ description: 'ID of the order' })
-  @IsUUID()
-  orderId!: string;
-
   @ApiProperty({
     description: 'Panuozzo size',
     example: 'half',
