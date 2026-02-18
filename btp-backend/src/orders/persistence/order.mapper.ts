@@ -10,7 +10,13 @@ export class OrderMapper {
       );
     }
 
-    const items: OrderItemModel[] = (entity.items ?? []).map((item) => {
+    if (!entity.items) {
+      throw new Error(
+        `Order "${entity.id}" is missing the items relation. Ensure it is loaded (with nested items.user and items.food) before mapping.`,
+      );
+    }
+
+    const items: OrderItemModel[] = entity.items.map((item) => {
       if (!item.user) {
         throw new Error(
           `OrderItem "${item.id}" on Order "${entity.id}" is missing the user relation. Ensure items.user is loaded before mapping.`,
