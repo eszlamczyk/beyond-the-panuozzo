@@ -2,10 +2,16 @@ import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { WishlistService } from './wishlist.service';
 import { WishlistRepositoryPort } from './wishlist-repository.port';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PanuozzoSize } from '../panuozzo-size.enum';
+import { OrderStatus } from '../order-status.enum';
 import type { WishlistItem } from './wishlist.model';
 import { Actor } from '../../auth/authorization/actor';
+import { OrdersService } from './orders.service';
 
 const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
   create: jest.fn(),
@@ -13,6 +19,10 @@ const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
   findByOrder: jest.fn(),
   updateRating: jest.fn(),
   remove: jest.fn(),
+};
+
+const mockOrdersService: jest.Mocked<Pick<OrdersService, 'findOne'>> = {
+  findOne: jest.fn(),
 };
 
 describe('WishlistService', () => {
@@ -41,6 +51,10 @@ describe('WishlistService', () => {
           provide: WishlistRepositoryPort,
           useValue: mockRepository,
         },
+        {
+          provide: OrdersService,
+          useValue: mockOrdersService,
+        },
       ],
     }).compile();
 
@@ -59,11 +73,19 @@ describe('WishlistService', () => {
       size: PanuozzoSize.HALF,
     };
 
-    it('should create a new wishlist item for the actor', async () => {
+    it('should create a new wishlist item for the actor when order is in Draft state', async () => {
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.DRAFT,
+        managerId: 'manager-1',
+        items: [],
+      });
       mockRepository.create.mockResolvedValue(mockWishlistItem);
 
       const result = await service.create(createInput, owner);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockOrdersService.findOne).toHaveBeenCalledWith('order-uuid-101');
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.create).toHaveBeenCalledWith({
         rating: 5,
@@ -75,8 +97,62 @@ describe('WishlistService', () => {
       expect(result).toEqual(mockWishlistItem);
     });
 
+    it('should throw BadRequestException when order is not in Draft state', async () => {
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.ORDERED,
+        managerId: 'manager-1',
+        items: [],
+      });
+
+      await expect(service.create(createInput, owner)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when order is in TO_ORDER state', async () => {
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.TO_ORDER,
+        managerId: 'manager-1',
+        items: [],
+      });
+
+      await expect(service.create(createInput, owner)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when order is in EATEN state', async () => {
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.EATEN,
+        managerId: 'manager-1',
+        items: [],
+      });
+
+      await expect(service.create(createInput, owner)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
     it('should allow duplicate wishlist items for the same user and food', async () => {
       const duplicateItem = { ...mockWishlistItem, id: 'wishlist-uuid-dup' };
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.DRAFT,
+        managerId: 'manager-1',
+        items: [],
+      });
       mockRepository.create.mockResolvedValue(duplicateItem);
 
       const result = await service.create(createInput, owner);
@@ -103,6 +179,12 @@ describe('WishlistService', () => {
     it('should update the rating of a wishlist item owned by the actor', async () => {
       const updatedItem = { ...mockWishlistItem, rating: 4 };
       mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.DRAFT,
+        managerId: 'manager-1',
+        items: [],
+      });
       mockRepository.updateRating.mockResolvedValue(updatedItem);
 
       const result = await service.updateRating(
@@ -117,6 +199,23 @@ describe('WishlistService', () => {
         4,
       );
       expect(result.rating).toBe(4);
+    });
+
+    it('should throw BadRequestException when order is not in Draft state', async () => {
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.ORDERED,
+        managerId: 'manager-1',
+        items: [],
+      });
+
+      await expect(
+        service.updateRating(mockWishlistId, { rating: 4 }, owner),
+      ).rejects.toThrow(BadRequestException);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockRepository.updateRating).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenException when actor does not own the item', async () => {
@@ -143,12 +242,35 @@ describe('WishlistService', () => {
   describe('remove', () => {
     it('should remove a wishlist item owned by the actor', async () => {
       mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.DRAFT,
+        managerId: 'manager-1',
+        items: [],
+      });
       mockRepository.remove.mockResolvedValue(undefined);
 
       await service.remove(mockWishlistId, owner);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.remove).toHaveBeenCalledWith(mockWishlistId);
+    });
+
+    it('should throw BadRequestException when order is not in Draft state', async () => {
+      mockRepository.findOne.mockResolvedValue(mockWishlistItem);
+      mockOrdersService.findOne.mockResolvedValue({
+        id: 'order-uuid-101',
+        status: OrderStatus.TO_ORDER,
+        managerId: 'manager-1',
+        items: [],
+      });
+
+      await expect(service.remove(mockWishlistId, owner)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockRepository.remove).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenException when actor does not own the item', async () => {
