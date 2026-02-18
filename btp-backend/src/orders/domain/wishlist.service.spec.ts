@@ -5,7 +5,7 @@ import { WishlistRepositoryPort } from './wishlist-repository.port';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PanuozzoSize } from '../panuozzo-size.enum';
 import type { WishlistItem } from './wishlist.model';
-import { Actor } from '../../domain/actor';
+import { Actor } from '../../auth/authorization/actor';
 
 const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
   create: jest.fn(),

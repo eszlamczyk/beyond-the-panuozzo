@@ -2,11 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthorizationModule } from '../authorization/authorization.module';
 import { authenticationConfig } from './authentication.config';
-import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { GoogleStrategy } from './google.strategy';
 import { JwtAuthenticationGuard } from './jwt-authentication.guard';
@@ -18,8 +15,6 @@ import { RefreshTokenService } from './refresh-token.service';
   imports: [
     ConfigModule.forFeature(authenticationConfig),
     PassportModule,
-    AuthorizationModule,
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
     TypeOrmModule.forFeature([RefreshToken]),
     JwtModule.registerAsync({
       imports: [ConfigModule.forFeature(authenticationConfig)],
@@ -30,7 +25,6 @@ import { RefreshTokenService } from './refresh-token.service';
       }),
     }),
   ],
-  controllers: [AuthenticationController],
   providers: [
     AuthenticationService,
     RefreshTokenService,
@@ -38,6 +32,6 @@ import { RefreshTokenService } from './refresh-token.service';
     JwtStrategy,
     JwtAuthenticationGuard,
   ],
-  exports: [JwtAuthenticationGuard],
+  exports: [JwtAuthenticationGuard, AuthenticationService, RefreshTokenService],
 })
 export class AuthenticationModule {}

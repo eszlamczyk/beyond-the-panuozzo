@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
 import { Food } from './persistence/food.entity';
 import { FoodType } from './persistence/food-type.entity';
 import { FoodsController } from './controller/foods.controller';
@@ -12,7 +13,7 @@ import { FoodsTypeOrmRepository } from './persistence/foods-typeorm.repository';
 import { FoodTypesTypeOrmRepository } from './persistence/food-types-typeorm.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Food, FoodType])],
+  imports: [TypeOrmModule.forFeature([Food, FoodType]), AuthModule],
   controllers: [FoodsController, FoodTypesController],
   providers: [
     FoodsService,

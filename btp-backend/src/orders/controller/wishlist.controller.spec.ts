@@ -1,8 +1,8 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
-import { EmailDomainGuard } from '../../authorization/email-domain.guard';
-import { Actor } from '../../domain/actor';
+import { JwtAuthenticationGuard } from '../../auth/authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../auth/authorization/email-domain.guard';
+import { Actor } from '../../auth/authorization/actor';
 import { UsersService } from '../../users/domain/users.service';
 import { WishlistController } from './wishlist.controller';
 import { WishlistService } from '../domain/wishlist.service';

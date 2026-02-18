@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Inject,
   Post,
   Query,
   Req,
@@ -11,16 +10,15 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import type { ConfigType } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
-import { authorizationConfig } from '../authorization/authorization.config';
 import { Authenticated } from './authenticated.decorator';
-import { AuthenticationService } from './authentication.service';
-import { GoogleAuthenticationGuard } from './google-authentication.guard';
-import { googleUserSchema } from './google-user.schema';
-import { jwtPayloadSchema } from './jwt-payload.schema';
-import { RefreshTokenService } from './refresh-token.service';
+import { EmailDomainGuard } from './authorization/email-domain.guard';
+import { AuthenticationService } from './authentication/authentication.service';
+import { GoogleAuthenticationGuard } from './authentication/google-authentication.guard';
+import { googleUserSchema } from './authentication/google-user.schema';
+import { jwtPayloadSchema } from './authentication/jwt-payload.schema';
+import { RefreshTokenService } from './authentication/refresh-token.service';
 
 /**
  * Handles the Google OAuth 2.0 login flow requests.
@@ -39,12 +37,10 @@ import { RefreshTokenService } from './refresh-token.service';
  * does not hang on an unresolvable redirect.
  */
 @Controller('auth')
-export class AuthenticationController {
+export class AuthController {
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly refreshTokenService: RefreshTokenService,
-    @Inject(authorizationConfig.KEY)
-    private readonly authzConfig: ConfigType<typeof authorizationConfig>,
   ) {}
 
   /**
@@ -66,7 +62,7 @@ export class AuthenticationController {
    * client redirect URI with the token attached as a query parameter.
    */
   @Get('google/callback')
-  @UseGuards(GoogleAuthenticationGuard)
+  @UseGuards(GoogleAuthenticationGuard, EmailDomainGuard)
   async googleCallback(
     @Req() req: Request,
     @Query('state') state: string,
@@ -83,10 +79,6 @@ export class AuthenticationController {
 
     if (!this.authenticationService.validateRedirectUri(redirectUri)) {
       throw new BadRequestException('Invalid redirect_uri in state.');
-    }
-
-    if (!user.email.endsWith(`@${this.authzConfig.allowedEmailDomain}`)) {
-      throw new UnauthorizedException('Email domain not allowed.');
     }
 
     const token = this.authenticationService.generateJwt(user);

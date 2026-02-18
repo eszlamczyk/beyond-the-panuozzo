@@ -1,7 +1,7 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
-import { EmailDomainGuard } from '../../authorization/email-domain.guard';
+import { JwtAuthenticationGuard } from '../../auth/authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../auth/authorization/email-domain.guard';
 import { FoodTypesController } from './food-types.controller';
 import { FoodTypesService } from '../domain/food-types.service';
 import { NotFoundException } from '@nestjs/common';

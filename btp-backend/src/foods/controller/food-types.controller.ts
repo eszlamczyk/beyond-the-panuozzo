@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Authenticated } from '../../authentication/authenticated.decorator';
+import { Authenticated } from '../../auth/authenticated.decorator';
 import { FoodTypesService } from '../domain/food-types.service';
 import { FoodTypeResponseDto } from './dto/food-type-response.dto';
 

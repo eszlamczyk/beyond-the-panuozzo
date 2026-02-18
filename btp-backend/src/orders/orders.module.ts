@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
 import { FoodsModule } from '../foods/foods.module';
 import { UsersModule } from '../users/users.module';
 import { Order } from './persistence/order.entity';
@@ -17,6 +18,7 @@ import { WishlistTypeOrmRepository } from './persistence/wishlist-typeorm.reposi
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, UserOrder, WishlistEntity]),
+    AuthModule,
     FoodsModule,
     UsersModule,
   ],

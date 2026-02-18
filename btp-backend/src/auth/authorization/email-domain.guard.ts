@@ -7,15 +7,18 @@ import {
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import type { Request } from 'express';
-import { jwtPayloadSchema } from '../authentication/jwt-payload.schema';
+import { z } from 'zod';
 import { authorizationConfig } from './authorization.config';
+
+const emailSchema = z.object({ email: z.email() });
 
 /**
  * Guard that rejects requests whose authenticated user does not belong to the
  * allowed email domain.
  *
- * Must be applied **after** {@link JwtAuthenticationGuard} so that `req.user` is already
- * populated with the decoded JWT payload.
+ * Must be applied **after** a guard that populates `req.user` with an object
+ * containing an `email` field (e.g. {@link JwtAuthenticationGuard} or
+ * {@link GoogleAuthenticationGuard}).
  */
 @Injectable()
 export class EmailDomainGuard implements CanActivate {
@@ -26,7 +29,7 @@ export class EmailDomainGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const result = jwtPayloadSchema.safeParse(request.user);
+    const result = emailSchema.safeParse(request.user);
 
     if (
       !result.success ||

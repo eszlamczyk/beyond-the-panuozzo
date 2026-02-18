@@ -13,9 +13,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { Authenticated } from '../../authentication/authenticated.decorator';
-import { jwtPayloadSchema } from '../../authentication/jwt-payload.schema';
-import { Actor } from '../../domain/actor';
+import { Authenticated } from '../../auth/authenticated.decorator';
+import { jwtPayloadSchema } from '../../auth/authentication/jwt-payload.schema';
+import { Actor } from '../../auth/authorization/actor';
 import { UsersService } from '../../users/domain/users.service';
 import { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
 import { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto';

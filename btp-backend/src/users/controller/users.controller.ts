@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Authenticated } from '../../authentication/authenticated.decorator';
+import { Authenticated } from '../../auth/authenticated.decorator';
 import { UsersService } from '../domain/users.service';
 import { UserResponseDto } from './dto/user-response.dto';
 

@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Actor } from '../../domain/actor';
+import { Actor } from '../../auth/authorization/actor';
 import { WishlistItem } from './wishlist.model';
 import { WishlistRepositoryPort } from './wishlist-repository.port';
 

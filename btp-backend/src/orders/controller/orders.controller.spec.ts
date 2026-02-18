@@ -1,7 +1,7 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import { JwtAuthenticationGuard } from '../../authentication/jwt-authentication.guard';
-import { EmailDomainGuard } from '../../authorization/email-domain.guard';
+import { JwtAuthenticationGuard } from '../../auth/authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from '../../auth/authorization/email-domain.guard';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from '../domain/orders.service';
 import { NotFoundException } from '@nestjs/common';

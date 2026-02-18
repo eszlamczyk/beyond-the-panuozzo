@@ -1,6 +1,6 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { EmailDomainGuard } from '../authorization/email-domain.guard';
-import { JwtAuthenticationGuard } from './jwt-authentication.guard';
+import { JwtAuthenticationGuard } from './authentication/jwt-authentication.guard';
+import { EmailDomainGuard } from './authorization/email-domain.guard';
 
 /**
  * Composite decorator that requires a valid JWT **and** a matching email domain.
