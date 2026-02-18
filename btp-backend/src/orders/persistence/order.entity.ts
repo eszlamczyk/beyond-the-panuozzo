@@ -8,7 +8,7 @@ import {
 import { OrderStatus } from '../order-status.enum';
 import { User } from '../../users/persistence/user.entity';
 import { UserOrder } from './user-order.entity';
-import { WishlistEntity } from './wishlist.entity';
+import { Wishlist } from './wishlist.entity';
 
 @Entity('orders')
 export class Order {
@@ -28,6 +28,6 @@ export class Order {
   @OneToMany(() => UserOrder, (userOrder) => userOrder.order)
   items!: UserOrder[];
 
-  @OneToMany(() => WishlistEntity, (wishlist) => wishlist.order)
-  wishlists!: WishlistEntity[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.order)
+  wishlists!: Wishlist[];
 }

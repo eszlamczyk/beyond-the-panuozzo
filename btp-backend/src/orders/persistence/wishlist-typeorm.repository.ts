@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WishlistItem } from '../domain/wishlist.model';
 import { WishlistRepositoryPort } from '../domain/wishlist-repository.port';
-import { WishlistEntity } from './wishlist.entity';
+import { Wishlist } from './wishlist.entity';
 import { WishlistMapper } from './wishlist.mapper';
 
 @Injectable()
 export class WishlistTypeOrmRepository extends WishlistRepositoryPort {
   constructor(
-    @InjectRepository(WishlistEntity)
-    private readonly repo: Repository<WishlistEntity>,
+    @InjectRepository(Wishlist)
+    private readonly repo: Repository<Wishlist>,
   ) {
     super();
   }

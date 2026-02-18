@@ -1,4 +1,4 @@
-import { WishlistEntity } from '../../orders/persistence/wishlist.entity';
+import { Wishlist } from '../../orders/persistence/wishlist.entity';
 import { Order } from '../../orders/persistence/order.entity';
 import { UserOrder } from '../../orders/persistence/user-order.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -19,6 +19,6 @@ export class User {
   managedOrders!: Order[];
   @OneToMany(() => UserOrder, (userOrder) => userOrder.user)
   items!: UserOrder[];
-  @OneToMany(() => WishlistEntity, (wishlist) => wishlist.user)
-  wishlists!: WishlistEntity[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.user)
+  wishlists!: Wishlist[];
 }

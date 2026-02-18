@@ -5,7 +5,7 @@ import { FoodsModule } from '../foods/foods.module';
 import { UsersModule } from '../users/users.module';
 import { Order } from './persistence/order.entity';
 import { UserOrder } from './persistence/user-order.entity';
-import { WishlistEntity } from './persistence/wishlist.entity';
+import { Wishlist } from './persistence/wishlist.entity';
 import { OrdersController } from './controller/orders.controller';
 import { WishlistController } from './controller/wishlist.controller';
 import { OrdersService } from './domain/orders.service';
@@ -17,7 +17,7 @@ import { WishlistTypeOrmRepository } from './persistence/wishlist-typeorm.reposi
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, UserOrder, WishlistEntity]),
+    TypeOrmModule.forFeature([Order, UserOrder, Wishlist]),
     AuthModule,
     FoodsModule,
     UsersModule,

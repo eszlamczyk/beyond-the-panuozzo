@@ -12,7 +12,7 @@ import {
 
 @Entity('wishlist')
 @Check(`"rating" >= 1 AND "rating" <= 5`)
-export class WishlistEntity {
+export class Wishlist {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

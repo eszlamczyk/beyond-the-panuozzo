@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { FoodType } from './food-type.entity';
 import { UserOrder } from '../../orders/persistence/user-order.entity';
-import { WishlistEntity } from '../../orders/persistence/wishlist.entity';
+import { Wishlist } from '../../orders/persistence/wishlist.entity';
 
 @Entity('foods')
 export class Food {
@@ -21,6 +21,6 @@ export class Food {
   userOrders!: UserOrder[];
   @ManyToOne(() => FoodType, (foodType) => foodType.foods)
   type!: FoodType;
-  @OneToMany(() => WishlistEntity, (wishlist) => wishlist.food)
-  wishlists!: WishlistEntity[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.food)
+  wishlists!: Wishlist[];
 }
