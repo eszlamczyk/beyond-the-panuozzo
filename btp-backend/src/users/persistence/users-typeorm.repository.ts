@@ -26,7 +26,7 @@ export class UsersTypeOrmRepository extends UsersRepositoryPort {
   async findByEmail(email: string): Promise<UserModel> {
     const user = await this.usersRepository.findOneBy({ email });
     if (!user) {
-      throw new NotFoundException(`User with email "${email}" not found`);
+      throw new NotFoundException('User not found');
     }
     return UserMapper.toDomain(user);
   }
