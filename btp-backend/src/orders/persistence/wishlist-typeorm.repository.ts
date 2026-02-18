@@ -1,0 +1,67 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { WishlistItem } from '../domain/wishlist.model';
+import { WishlistRepositoryPort } from '../domain/wishlist-repository.port';
+import { Wishlist } from './wishlist.entity';
+import { WishlistMapper } from './wishlist.mapper';
+
+@Injectable()
+export class WishlistTypeOrmRepository extends WishlistRepositoryPort {
+  constructor(
+    @InjectRepository(Wishlist)
+    private readonly repo: Repository<Wishlist>,
+  ) {
+    super();
+  }
+
+  async create(
+    item: Omit<WishlistItem, 'id' | 'foodName'>,
+  ): Promise<WishlistItem> {
+    const entity = this.repo.create({
+      rating: item.rating,
+      size: item.size,
+      user: { id: item.userId },
+      food: { id: item.foodId },
+      order: { id: item.orderId },
+    });
+
+    const saved = await this.repo.save(entity);
+    return WishlistMapper.toDomain(saved);
+  }
+
+  async findOne(id: string): Promise<WishlistItem> {
+    const entity = await this.repo.findOne({
+      where: { id },
+      relations: ['food', 'user', 'order'],
+    });
+    if (!entity) {
+      throw new NotFoundException(`Wishlist item with ID "${id}" not found`);
+    }
+    return WishlistMapper.toDomain(entity);
+  }
+
+  async findByOrder(orderId: string): Promise<WishlistItem[]> {
+    const entities = await this.repo.find({
+      where: { order: { id: orderId } },
+      relations: ['food', 'user', 'order'],
+    });
+    return entities.map((entity) => WishlistMapper.toDomain(entity));
+  }
+
+  async updateRating(id: string, rating: number): Promise<WishlistItem> {
+    const entity = await this.repo.preload({ id, rating });
+    if (!entity) {
+      throw new NotFoundException(`Wishlist item with ID "${id}" not found`);
+    }
+    const saved = await this.repo.save(entity);
+    return WishlistMapper.toDomain(saved);
+  }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Wishlist item with ID "${id}" not found`);
+    }
+  }
+}
