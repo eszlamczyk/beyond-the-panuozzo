@@ -84,7 +84,6 @@ describe('WishlistService', () => {
 
       const result = await service.create(createInput, owner);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockOrdersService.findOne).toHaveBeenCalledWith('order-uuid-101');
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockRepository.create).toHaveBeenCalledWith({
