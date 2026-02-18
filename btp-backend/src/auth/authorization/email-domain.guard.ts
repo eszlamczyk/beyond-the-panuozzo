@@ -33,7 +33,9 @@ export class EmailDomainGuard implements CanActivate {
 
     if (
       !result.success ||
-      !result.data.email.endsWith(`@${this.config.allowedEmailDomain}`)
+      !result.data.email
+        .toLowerCase()
+        .endsWith(`@${this.config.allowedEmailDomain.toLowerCase()}`)
     ) {
       throw new UnauthorizedException('Email domain not allowed.');
     }
