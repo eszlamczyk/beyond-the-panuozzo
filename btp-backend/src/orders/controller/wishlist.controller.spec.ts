@@ -9,7 +9,7 @@ import { WishlistService } from '../domain/wishlist.service';
 import type { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
 import type { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto';
 import { NotFoundException } from '@nestjs/common';
-import { PanuozzoSize } from '../panuozzo-size.enum';
+import { PanuozzoSize } from '@btp/shared';
 import type { WishlistItem } from '../domain/wishlist.model';
 import type { Request } from 'express';
 

@@ -1,6 +1,6 @@
 import { Food } from '../../foods/persistence/food.entity';
 import { Order } from './order.entity';
-import { PanuozzoSize } from '../panuozzo-size.enum';
+import { PanuozzoSize } from '@btp/shared';
 import { User } from '../../users/persistence/user.entity';
 import {
   Check,

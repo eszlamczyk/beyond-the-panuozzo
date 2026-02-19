@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersRepositoryPort } from './orders-repository.port';
 import { OrderEventsService } from './order-events.service';
-import { OrderStatus } from '../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 import type { OrderModel } from './order.model';
 
 const mockRepository: jest.Mocked<OrdersRepositoryPort> = {

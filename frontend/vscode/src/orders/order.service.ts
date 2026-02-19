@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { OrderStatus } from '@btp/shared';
 import type { AuthService } from '../auth';
 import type { IOrderClient } from '../api/client';
 import type { MenuItem, Order, Participant, WishlistItem } from '../types';
@@ -49,7 +50,7 @@ export class OrderService implements vscode.Disposable {
     vscode.commands.executeCommand(
       'setContext',
       'btp.hasDraftOrder',
-      order?.status === 'draft',
+      order?.status === OrderStatus.DRAFT,
     );
   }
 
@@ -99,7 +100,7 @@ export class OrderService implements vscode.Disposable {
   /** Adds a wishlist item, silently no-ops if the order isn't in draft state. */
   async addItem(item: WishlistItem): Promise<void> {
     const order = this.getOrder();
-    if (!order || order.status !== 'draft') {
+    if (!order || order.status !== OrderStatus.DRAFT) {
       return;
     }
     await this.client.addWishlistItem(order.id, item);
@@ -108,7 +109,7 @@ export class OrderService implements vscode.Disposable {
   /** Removes a wishlist item, silently no-ops if the order isn't in draft state. */
   async removeItem(menuItemId: string): Promise<void> {
     const order = this.getOrder();
-    if (!order || order.status !== 'draft') {
+    if (!order || order.status !== OrderStatus.DRAFT) {
       return;
     }
     await this.client.removeWishlistItem(order.id, menuItemId);

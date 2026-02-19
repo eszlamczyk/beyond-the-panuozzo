@@ -6,7 +6,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from '../domain/orders.service';
 import { NotFoundException } from '@nestjs/common';
 import type { OrderModel } from '../domain/order.model';
-import { OrderStatus } from '../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 
 describe('OrdersController', () => {
   let controller: OrdersController;

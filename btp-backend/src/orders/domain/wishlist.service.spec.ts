@@ -7,8 +7,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { PanuozzoSize } from '../panuozzo-size.enum';
-import { OrderStatus } from '../order-status.enum';
+import { PanuozzoSize, OrderStatus } from '@btp/shared';
 import type { WishlistItem } from './wishlist.model';
 import { Actor } from '../../auth/authorization/actor';
 import { OrderEventsService } from './order-events.service';

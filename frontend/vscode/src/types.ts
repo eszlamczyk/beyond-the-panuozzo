@@ -1,4 +1,4 @@
-export type OrderStatus = 'draft' | 'finalized';
+import type { OrderStatus } from '@btp/shared';
 
 export interface MenuItem {
   id: string;

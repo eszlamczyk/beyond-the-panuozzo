@@ -4,6 +4,7 @@
  * To be replaced with real client when the backend is implemented.
  */
 
+import { OrderStatus } from '@btp/shared';
 import type { IOrderClient, OrderEvent } from './client';
 import type {
   FinalizedOrder,
@@ -150,7 +151,7 @@ export class MockOrderClient implements IOrderClient {
     if (
       !this.order ||
       this.order.id !== orderId ||
-      this.order.status !== 'draft'
+      this.order.status !== OrderStatus.DRAFT
     ) {
       return;
     }
@@ -172,7 +173,7 @@ export class MockOrderClient implements IOrderClient {
     if (
       !this.order ||
       this.order.id !== orderId ||
-      this.order.status !== 'draft'
+      this.order.status !== OrderStatus.DRAFT
     ) {
       return;
     }
@@ -201,7 +202,7 @@ export class MockOrderClient implements IOrderClient {
     const t = setTimeout(() => {
       this.order = {
         id: 'order-001',
-        status: 'draft',
+        status: OrderStatus.DRAFT,
         createdAt: new Date(),
         menu: [...MOCK_MENU],
         participants: buildMockParticipants(this.resolveUserId()),
@@ -217,7 +218,7 @@ export class MockOrderClient implements IOrderClient {
       if (!this.order) {
         return;
       }
-      this.order.status = 'finalized';
+      this.order.status = OrderStatus.ORDERED;
       this.order.finalizedOrder = buildFinalizedOrder(this.order.participants);
       this.emit({ type: 'finalized', order: this.order });
     }, FINALIZE_DELAY_MS);

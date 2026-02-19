@@ -1,3 +1,6 @@
+import type { OrderStatus } from '@btp/shared';
+export type { OrderStatus };
+
 export type Food = {
   id: string;
   name: string;
@@ -17,8 +20,6 @@ export type User = {
   email: string;
   phoneNumber: string;
 };
-
-export type OrderStatus = 0 | 1 | 2 | 3;
 
 export type OrderItem = {
   id: string;

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsUUID, Max, Min } from 'class-validator';
-import { PanuozzoSize } from '../../panuozzo-size.enum';
+import { PanuozzoSize } from '@btp/shared';
 
 export class CreateWishlistRequestDto {
   @ApiProperty({

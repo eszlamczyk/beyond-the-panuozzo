@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderStatus } from '../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 import { OrderModel } from './order.model';
 import { OrdersRepositoryPort } from './orders-repository.port';
 import { OrderEventsService } from './order-events.service';

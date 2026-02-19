@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PanuozzoSize } from '../../panuozzo-size.enum';
+import { PanuozzoSize } from '@btp/shared';
 import { OrderItemModel } from '../../domain/order-item.model';
 
 export class OrderItemResponseDto {
