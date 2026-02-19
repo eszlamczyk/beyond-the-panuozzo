@@ -38,6 +38,7 @@ export const ApiPaths = {
   AuthGoogle: '/auth/google',
   AuthRefresh: '/auth/refresh',
   AuthSignOut: '/auth/sign-out',
+  OrderEvents: '/orders/events',
 } as const;
 
 /** Internal extension hyperlink paths */

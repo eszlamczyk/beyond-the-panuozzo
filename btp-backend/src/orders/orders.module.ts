@@ -7,8 +7,10 @@ import { Order } from './persistence/order.entity';
 import { UserOrder } from './persistence/user-order.entity';
 import { Wishlist } from './persistence/wishlist.entity';
 import { OrdersController } from './controller/orders.controller';
+import { OrderEventsController } from './controller/order-events.controller';
 import { WishlistController } from './controller/wishlist.controller';
 import { OrdersService } from './domain/orders.service';
+import { OrderEventsService } from './domain/order-events.service';
 import { WishlistService } from './domain/wishlist.service';
 import { OrdersRepositoryPort } from './domain/orders-repository.port';
 import { OrdersTypeOrmRepository } from './persistence/orders-typeorm.repository';
@@ -22,9 +24,10 @@ import { WishlistTypeOrmRepository } from './persistence/wishlist-typeorm.reposi
     FoodsModule,
     UsersModule,
   ],
-  controllers: [OrdersController, WishlistController],
+  controllers: [OrdersController, OrderEventsController, WishlistController],
   providers: [
     OrdersService,
+    OrderEventsService,
     WishlistService,
     {
       provide: OrdersRepositoryPort,
@@ -35,6 +38,6 @@ import { WishlistTypeOrmRepository } from './persistence/wishlist-typeorm.reposi
       useClass: WishlistTypeOrmRepository,
     },
   ],
-  exports: [OrdersService, WishlistService],
+  exports: [OrdersService, OrderEventsService, WishlistService],
 })
 export class OrdersModule {}
