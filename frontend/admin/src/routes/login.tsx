@@ -14,7 +14,7 @@ export const Route = createFileRoute('/login')({
   beforeLoad: () => {
     const token = useAuthStore.getState().token;
     if (token) {
-      throw redirect({ to: '/foods' });
+      throw redirect({ to: '/foods' }) as unknown;
     }
   },
   component: LoginPage,
