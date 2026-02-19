@@ -70,21 +70,23 @@ describe('AuthenticationService', () => {
       const redirectUri = 'vscode://eszlamczyk.beyond-the-panuozzo/auth';
       const clientState = 'some-random-state';
 
-      const encoded = service.encodeState(redirectUri, clientState);
+      const encoded = service.encodeState(redirectUri, 'user', clientState);
       const decoded = service.decodeState(encoded);
 
       expect(decoded.redirectUri).toBe(redirectUri);
       expect(decoded.clientState).toBe(clientState);
+      expect(decoded.capability).toBe('user');
     });
 
     it('should handle undefined clientState', () => {
       const redirectUri = 'http://localhost:3000/callback';
 
-      const encoded = service.encodeState(redirectUri);
+      const encoded = service.encodeState(redirectUri, 'admin');
       const decoded = service.decodeState(encoded);
 
       expect(decoded.redirectUri).toBe(redirectUri);
       expect(decoded.clientState).toBeUndefined();
+      expect(decoded.capability).toBe('admin');
     });
   });
 
@@ -97,13 +99,14 @@ describe('AuthenticationService', () => {
         photo: 'https://example.com/photo.jpg',
       };
 
-      const token = service.generateJwt(user);
+      const token = service.generateJwt(user, 'admin');
 
       expect(token).toBe('mock-jwt-token');
       expect(signMock).toHaveBeenCalledWith({
         sub: '12345',
         email: 'test@example.com',
         name: 'Test User',
+        capability: 'admin',
       });
     });
   });

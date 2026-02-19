@@ -18,6 +18,7 @@ describe('FoodsService', () => {
 
   beforeEach(async () => {
     const mockRepository: jest.Mocked<FoodsRepositoryPort> = {
+      findAll: jest.fn(),
       findOne: jest.fn(),
     };
 

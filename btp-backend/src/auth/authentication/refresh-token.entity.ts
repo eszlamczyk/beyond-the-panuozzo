@@ -5,6 +5,7 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import type { Capability } from './jwt-payload.schema';
 
 @Entity('refresh_tokens')
 export class RefreshToken {
@@ -26,6 +27,10 @@ export class RefreshToken {
 
   @Column()
   displayName!: string;
+
+  /** The capability this token was issued for (`'user'` or `'admin'`). */
+  @Column({ default: 'user' })
+  capability!: Capability;
 
   @CreateDateColumn()
   createdAt!: Date;

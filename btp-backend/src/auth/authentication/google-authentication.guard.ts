@@ -8,11 +8,15 @@ import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { z } from 'zod';
 import { AuthenticationService } from './authentication.service';
+import { capabilitySchema } from './jwt-payload.schema';
+
+const DEFAULT_CAPABILITY = 'user' as const;
 
 /** Expected query parameters for authentication request. */
 const googleAuthQuerySchema = z.object({
   redirect_uri: z.string().min(1),
   state: z.string().optional(),
+  capability: capabilitySchema.default('user'),
 });
 
 /** Google authentication guard */
@@ -39,10 +43,17 @@ export class GoogleAuthenticationGuard extends AuthGuard('google') {
    */
   override getAuthenticateOptions(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
-    const { redirect_uri: redirectUri, state: clientState } =
-      googleAuthQuerySchema.partial().parse(request.query);
+    const {
+      redirect_uri: redirectUri,
+      state: clientState,
+      capability,
+    } = googleAuthQuerySchema.partial().parse(request.query);
 
-    const statePayload = JSON.stringify({ redirectUri, clientState });
+    const statePayload = JSON.stringify({
+      redirectUri,
+      clientState,
+      capability: capability ?? DEFAULT_CAPABILITY,
+    });
     const encodedState = Buffer.from(statePayload).toString('base64url');
 
     return { state: encodedState };

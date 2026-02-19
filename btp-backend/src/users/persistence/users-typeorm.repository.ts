@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserModel } from '../domain/user.model';
-import { UsersRepositoryPort } from '../domain/users-repository.port';
+import {
+  PaginatedResult,
+  UsersRepositoryPort,
+} from '../domain/users-repository.port';
 import { User } from './user.entity';
 import { UserMapper } from './user.mapper';
 
@@ -13,6 +16,19 @@ export class UsersTypeOrmRepository extends UsersRepositoryPort {
     private readonly usersRepository: Repository<User>,
   ) {
     super();
+  }
+
+  async findAll(page = 1, limit = 20): Promise<PaginatedResult<UserModel>> {
+    const [users, total] = await this.usersRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return {
+      items: users.map((user) => UserMapper.toDomain(user)),
+      total,
+      page,
+      limit,
+    };
   }
 
   async findOne(id: string): Promise<UserModel> {

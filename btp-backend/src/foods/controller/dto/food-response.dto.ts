@@ -12,7 +12,7 @@ export class FoodResponseDto {
   price!: number;
 
   @ApiPropertyOptional()
-  typeName?: string;
+  typeName?: string | undefined;
 
   static fromDomain(model: FoodModel): FoodResponseDto {
     const dto = new FoodResponseDto();

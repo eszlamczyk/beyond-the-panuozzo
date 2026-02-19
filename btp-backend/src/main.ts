@@ -1,10 +1,25 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
+
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
+  if (!allowedOrigins) {
+    throw new Error('Missing required environment variable: ALLOWED_ORIGINS');
+  }
+
+  app.enableCors({
+    origin: allowedOrigins
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

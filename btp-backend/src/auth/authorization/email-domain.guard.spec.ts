@@ -14,7 +14,10 @@ describe('EmailDomainGuard', () => {
   let guard: EmailDomainGuard;
 
   beforeEach(() => {
-    guard = new EmailDomainGuard({ allowedEmailDomain: 'example.com' });
+    guard = new EmailDomainGuard({
+      allowedEmailDomain: 'example.com',
+      adminEmails: [],
+    });
   });
 
   it('should allow a user with the correct email domain', () => {

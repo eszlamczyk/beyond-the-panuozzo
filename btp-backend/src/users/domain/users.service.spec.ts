@@ -6,6 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import type { UserModel } from './user.model';
 
 const mockUsersRepository: jest.Mocked<UsersRepositoryPort> = {
+  findAll: jest.fn(),
   findOne: jest.fn(),
   findByEmail: jest.fn(),
 };

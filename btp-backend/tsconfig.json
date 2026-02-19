@@ -22,6 +22,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": false
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedSideEffectImports": true
   }
 }

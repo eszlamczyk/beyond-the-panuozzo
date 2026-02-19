@@ -32,6 +32,11 @@ import { RefreshTokenService } from './refresh-token.service';
     JwtStrategy,
     JwtAuthenticationGuard,
   ],
-  exports: [JwtAuthenticationGuard, AuthenticationService, RefreshTokenService],
+  exports: [
+    ConfigModule.forFeature(authenticationConfig),
+    JwtAuthenticationGuard,
+    AuthenticationService,
+    RefreshTokenService,
+  ],
 })
 export class AuthenticationModule {}
