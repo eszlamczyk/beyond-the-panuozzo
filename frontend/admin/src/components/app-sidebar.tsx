@@ -24,7 +24,7 @@ const navItems = [
 export function AppSidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
-  const clearTokens = useAuthStore((s) => s.clearTokens);
+  const clearToken = useAuthStore((s) => s.clearToken);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -33,7 +33,7 @@ export function AppSidebar() {
     } catch {
       // Sign out locally even if the API call fails
     }
-    clearTokens();
+    clearToken();
     await navigate({ to: '/login' });
   };
 

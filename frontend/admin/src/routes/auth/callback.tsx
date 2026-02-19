@@ -3,26 +3,21 @@ import { useAuthStore } from '@/auth/auth-store';
 
 type CallbackSearch = {
   token?: string;
-  refresh_token?: string;
 };
 
 export const Route = createFileRoute('/auth/callback')({
   validateSearch: (search: Record<string, unknown>): CallbackSearch => ({
     token: typeof search.token === 'string' ? search.token : undefined,
-    refresh_token:
-      typeof search.refresh_token === 'string'
-        ? search.refresh_token
-        : undefined,
   }),
   component: AuthCallback,
 });
 
 function AuthCallback() {
-  const { token, refresh_token } = useSearch({ from: '/auth/callback' });
-  const setTokens = useAuthStore((s) => s.setTokens);
+  const { token } = useSearch({ from: '/auth/callback' });
+  const setToken = useAuthStore((s) => s.setToken);
 
-  if (token && refresh_token) {
-    setTokens(token, refresh_token);
+  if (token) {
+    setToken(token);
     return <Navigate to="/foods" />;
   }
 

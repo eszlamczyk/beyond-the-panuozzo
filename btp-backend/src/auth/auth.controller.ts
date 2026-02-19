@@ -14,15 +14,28 @@ import {
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import type { Response, Request } from 'express';
+import type { Response, Request, CookieOptions } from 'express';
 import { Authenticated } from './authenticated.decorator';
 import { EmailDomainGuard } from './authorization/email-domain.guard';
 import { authorizationConfig } from './authorization/authorization.config';
 import { AuthenticationService } from './authentication/authentication.service';
+import { authenticationConfig } from './authentication/authentication.config';
 import { GoogleAuthenticationGuard } from './authentication/google-authentication.guard';
 import { googleUserSchema } from './authentication/google-user.schema';
 import { jwtPayloadSchema } from './authentication/jwt-payload.schema';
 import { RefreshTokenService } from './authentication/refresh-token.service';
+
+const REFRESH_TOKEN_COOKIE = 'btp_refresh_token';
+
+function refreshTokenCookieOptions(maxAgeDays: number): CookieOptions {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/auth',
+    maxAge: maxAgeDays * 24 * 60 * 60 * 1000,
+  };
+}
 
 /**
  * Handles the Google OAuth 2.0 login flow requests.
@@ -47,6 +60,8 @@ export class AuthController {
     private readonly refreshTokenService: RefreshTokenService,
     @Inject(authorizationConfig.KEY)
     private readonly authzConfig: ConfigType<typeof authorizationConfig>,
+    @Inject(authenticationConfig.KEY)
+    private readonly authnConfig: ConfigType<typeof authenticationConfig>,
   ) {}
 
   /**
@@ -115,6 +130,13 @@ export class AuthController {
     const targetUrl = url.toString();
 
     if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+      res.cookie(
+        REFRESH_TOKEN_COOKIE,
+        refreshToken,
+        refreshTokenCookieOptions(
+          this.authnConfig.refreshToken.lifetimeDays,
+        ),
+      );
       res.redirect(targetUrl);
       return;
     }
@@ -126,8 +148,16 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(ThrottlerGuard)
   async refresh(
-    @Body('refresh_token') refreshToken: string,
+    @Body('refresh_token') bodyToken: string | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<{ token: string; refresh_token: string }> {
+    const refreshToken =
+      bodyToken ||
+      (req.cookies as Record<string, string | undefined>)?.[
+        REFRESH_TOKEN_COOKIE
+      ];
+
     if (!refreshToken) {
       throw new BadRequestException('Missing refresh_token.');
     }
@@ -144,18 +174,28 @@ export class AuthController {
       user.capability,
     );
 
+    res.cookie(
+      REFRESH_TOKEN_COOKIE,
+      newRefreshToken,
+      refreshTokenCookieOptions(this.authnConfig.refreshToken.lifetimeDays),
+    );
+
     return { token: accessToken, refresh_token: newRefreshToken };
   }
 
   /** Revokes all refresh tokens for the authenticated user. */
   @Authenticated()
   @Post('sign-out')
-  async signOut(@Req() req: Request): Promise<{ ok: true }> {
+  async signOut(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ ok: true }> {
     const result = jwtPayloadSchema.safeParse(req.user);
     if (!result.success) {
       throw new UnauthorizedException('Invalid token payload.');
     }
     await this.refreshTokenService.revokeAllForUser(result.data.sub);
+    res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/auth' });
     return { ok: true };
   }
 }

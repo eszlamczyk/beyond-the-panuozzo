@@ -7,29 +7,25 @@ if (!import.meta.env.VITE_API_BASE_URL) {
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string;
 
 async function refreshAccessToken(): Promise<string | null> {
-  const { refreshToken, setTokens, clearTokens } = useAuthStore.getState();
-  if (!refreshToken) return null;
+  const { setToken, clearToken } = useAuthStore.getState();
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      clearTokens();
+      clearToken();
       return null;
     }
 
-    const data = (await response.json()) as {
-      token: string;
-      refresh_token: string;
-    };
-    setTokens(data.token, data.refresh_token);
+    const data = (await response.json()) as { token: string };
+    setToken(data.token);
     return data.token;
   } catch {
-    clearTokens();
+    clearToken();
     return null;
   }
 }
@@ -43,6 +39,7 @@ export async function apiFetch<T>(
   const doFetch = (accessToken: string | null) =>
     fetch(`${API_BASE_URL}${path}`, {
       ...init,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -60,7 +57,7 @@ export async function apiFetch<T>(
   }
 
   if (response.status === 401) {
-    useAuthStore.getState().clearTokens();
+    useAuthStore.getState().clearToken();
     throw new ApiError(401, 'Unauthorized');
   }
 
