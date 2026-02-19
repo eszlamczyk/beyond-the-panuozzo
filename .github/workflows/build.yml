@@ -1,11 +1,7 @@
-name: Build 
+name: Build
 
 on:
   workflow_call:
-    inputs:
-      directory:
-        required: true
-        type: string
 
 jobs:
   build:
@@ -16,33 +12,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 25
-          cache: npm
-          cache-dependency-path: "${{ inputs.directory }}/package-lock.json"
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        working-directory: ${{ inputs.directory }}
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Lint with ESLint
-        working-directory: ${{ inputs.directory }}
-        run: npm run lint:check
+      - name: Lint
+        run: pnpm lint
 
       - name: Type check
-        working-directory: ${{ inputs.directory }}
-        run: npm run typecheck
+        run: pnpm turbo run typecheck
 
       - name: Check formatting
-        working-directory: ${{ inputs.directory }}
-        run: npm run format:check
+        run: pnpm turbo run format:check
 
       - name: Run tests
-        working-directory: ${{ inputs.directory }}
-        run: npm test -- --coverage
+        run: pnpm test
 
-      - name: Build project
-        working-directory: ${{ inputs.directory }}
-        run: npm run build
+      - name: Build
+        run: pnpm build

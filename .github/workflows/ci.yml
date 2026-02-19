@@ -17,14 +17,8 @@ jobs:
     steps:
       - uses: toshimaru/auto-author-assign@v2.1.1
 
-
   build:
     if: '! github.event.pull_request.draft'
     name: Build
-    strategy:
-      matrix:
-        directory: [btp-backend, frontend/admin, frontend/vscode]
     uses: ./.github/workflows/build.yml
-    with:
-      directory: ${{ matrix.directory }}
     secrets: inherit
