@@ -86,7 +86,10 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
     try {
       await this.foodsRepository.remove(food);
     } catch (error) {
-      if (error instanceof QueryFailedError && (error.driverError as { code?: string })?.code === '23503') {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string })?.code === '23503'
+      ) {
         throw new ConflictException(
           'Cannot delete food that is used in orders or wishlists',
         );

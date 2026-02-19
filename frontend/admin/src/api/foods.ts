@@ -1,6 +1,11 @@
 import { queryOptions } from '@tanstack/react-query';
 import { apiFetch } from './client';
-import type { Food, FoodType, CreateFoodRequest, UpdateFoodRequest } from './types';
+import type {
+  Food,
+  FoodType,
+  CreateFoodRequest,
+  UpdateFoodRequest,
+} from './types';
 
 export function getFoods(): Promise<Food[]> {
   return apiFetch<Food[]>('/foods');

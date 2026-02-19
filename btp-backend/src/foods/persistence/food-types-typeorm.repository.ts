@@ -59,7 +59,10 @@ export class FoodTypesTypeOrmRepository extends FoodTypesRepositoryPort {
     try {
       await this.foodTypesRepository.remove(foodType);
     } catch (error) {
-      if (error instanceof QueryFailedError && (error.driverError as { code?: string })?.code === '23503') {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string })?.code === '23503'
+      ) {
         throw new ConflictException(
           'Cannot delete food type that has associated foods',
         );

@@ -15,7 +15,10 @@ import { FoodsTypeOrmRepository } from './persistence/foods-typeorm.repository';
 import { FoodTypesTypeOrmRepository } from './persistence/food-types-typeorm.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Food, FoodType, UserOrder, Wishlist]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Food, FoodType, UserOrder, Wishlist]),
+    AuthModule,
+  ],
   controllers: [FoodTypesController, FoodsController],
   providers: [
     FoodsService,

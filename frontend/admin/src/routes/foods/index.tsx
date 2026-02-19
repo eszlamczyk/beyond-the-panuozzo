@@ -140,9 +140,15 @@ function FoodsTableBody({
   if (isLoading) {
     return Array.from({ length: 5 }).map((_, i) => (
       <TableRow key={i}>
-        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-        <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-16" /></TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-32" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-20" />
+        </TableCell>
+        <TableCell className="text-right">
+          <Skeleton className="ml-auto h-4 w-16" />
+        </TableCell>
         <TableCell />
       </TableRow>
     ));
@@ -151,7 +157,10 @@ function FoodsTableBody({
   if (foods?.length === 0) {
     return (
       <TableRow>
-        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+        <TableCell
+          colSpan={4}
+          className="h-24 text-center text-muted-foreground"
+        >
           No foods found.
         </TableCell>
       </TableRow>
@@ -201,7 +210,9 @@ function isValidPrice(value: string): boolean {
 }
 
 function isFoodFormValid(form: FoodFormData): boolean {
-  return form.name.trim() !== '' && isValidPrice(form.price) && form.typeId !== '';
+  return (
+    form.name.trim() !== '' && isValidPrice(form.price) && form.typeId !== ''
+  );
 }
 
 function FoodFormDialog({
@@ -219,7 +230,11 @@ function FoodFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         {open && (
-          <FoodFormContent food={food} onOpenChange={onOpenChange} onSaved={onSaved} />
+          <FoodFormContent
+            food={food}
+            onOpenChange={onOpenChange}
+            onSaved={onSaved}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -236,7 +251,9 @@ function FoodFormContent({
   onSaved: () => Promise<void>;
 }) {
   const { data: foodTypes } = useQuery(foodTypesQueryOptions);
-  const [form, setForm] = useState<FoodFormData>(food ? toFormData(food) : emptyForm);
+  const [form, setForm] = useState<FoodFormData>(
+    food ? toFormData(food) : emptyForm,
+  );
 
   const createMutation = useMutation({
     mutationFn: createFood,
@@ -247,8 +264,13 @@ function FoodFormContent({
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof updateFood>[1] }) =>
-      updateFood(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Parameters<typeof updateFood>[1];
+    }) => updateFood(id, data),
     onSuccess: () => {
       void onSaved();
       onOpenChange(false);
@@ -318,7 +340,9 @@ function FoodFormContent({
             </SelectTrigger>
             <SelectContent>
               {foodTypes?.map((t) => (
-                <SelectItem key={t.id} value={t.id}>{t.type}</SelectItem>
+                <SelectItem key={t.id} value={t.id}>
+                  {t.type}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -363,13 +387,14 @@ function FoodDeleteDialog({
         <DialogHeader>
           <DialogTitle>Delete Food</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete{' '}
-            <strong>{food?.name}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{food?.name}</strong>? This
+            action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         {deleteMutation.error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {deleteMutation.error instanceof ApiError && deleteMutation.error.status === 409
+            {deleteMutation.error instanceof ApiError &&
+            deleteMutation.error.status === 409
               ? 'This food cannot be deleted because it is referenced by existing orders or wishlists.'
               : 'Something went wrong. Please try again.'}
           </div>

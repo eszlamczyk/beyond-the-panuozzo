@@ -128,7 +128,9 @@ function FoodTypesTableBody({
   if (isLoading) {
     return Array.from({ length: 3 }).map((_, i) => (
       <TableRow key={i}>
-        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-32" />
+        </TableCell>
         <TableCell />
       </TableRow>
     ));
@@ -137,7 +139,10 @@ function FoodTypesTableBody({
   if (foodTypes?.length === 0) {
     return (
       <TableRow>
-        <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
+        <TableCell
+          colSpan={2}
+          className="h-24 text-center text-muted-foreground"
+        >
           No food types found.
         </TableCell>
       </TableRow>
@@ -176,7 +181,11 @@ function FoodTypeFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         {open && (
-          <FoodTypeFormContent foodType={foodType} onOpenChange={onOpenChange} onSaved={onSaved} />
+          <FoodTypeFormContent
+            foodType={foodType}
+            onOpenChange={onOpenChange}
+            onSaved={onSaved}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -226,7 +235,9 @@ function FoodTypeFormContent({
   return (
     <form onSubmit={handleSubmit}>
       <DialogHeader>
-        <DialogTitle>{foodType ? 'Edit Food Type' : 'Add Food Type'}</DialogTitle>
+        <DialogTitle>
+          {foodType ? 'Edit Food Type' : 'Add Food Type'}
+        </DialogTitle>
         <DialogDescription>
           {foodType ? 'Update the food type name.' : 'Add a new food type.'}
         </DialogDescription>
@@ -281,13 +292,14 @@ function FoodTypeDeleteDialog({
         <DialogHeader>
           <DialogTitle>Delete Food Type</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete{' '}
-            <strong>{foodType?.type}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{foodType?.type}</strong>?
+            This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         {deleteMutation.error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {deleteMutation.error instanceof ApiError && deleteMutation.error.status === 409
+            {deleteMutation.error instanceof ApiError &&
+            deleteMutation.error.status === 409
               ? 'This food type cannot be deleted because it still has foods associated with it.'
               : 'Something went wrong. Please try again.'}
           </div>
