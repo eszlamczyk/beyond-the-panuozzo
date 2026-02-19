@@ -63,7 +63,10 @@ export class WishlistService {
       );
     }
     await this.ensureOrderIsDraft(item.orderId);
-    const updated = await this.wishlistRepository.updateRating(id, input.rating);
+    const updated = await this.wishlistRepository.updateRating(
+      id,
+      input.rating,
+    );
     await this.emitOrderUpdated(item.orderId);
     return updated;
   }
