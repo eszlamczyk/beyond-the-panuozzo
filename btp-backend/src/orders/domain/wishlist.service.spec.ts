@@ -11,6 +11,7 @@ import { PanuozzoSize } from '../panuozzo-size.enum';
 import { OrderStatus } from '../order-status.enum';
 import type { WishlistItem } from './wishlist.model';
 import { Actor } from '../../auth/authorization/actor';
+import { OrderEventsService } from './order-events.service';
 import { OrdersService } from './orders.service';
 
 const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
@@ -23,6 +24,10 @@ const mockRepository: jest.Mocked<WishlistRepositoryPort> = {
 
 const mockOrdersService: jest.Mocked<Pick<OrdersService, 'findOne'>> = {
   findOne: jest.fn(),
+};
+
+const mockEventsService: jest.Mocked<Pick<OrderEventsService, 'emit'>> = {
+  emit: jest.fn(),
 };
 
 describe('WishlistService', () => {
@@ -54,6 +59,10 @@ describe('WishlistService', () => {
         {
           provide: OrdersService,
           useValue: mockOrdersService,
+        },
+        {
+          provide: OrderEventsService,
+          useValue: mockEventsService,
         },
       ],
     }).compile();
