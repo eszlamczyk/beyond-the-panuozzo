@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@btp/shared'
+import type { OrderStatus } from '@btp/shared';
 
 export interface MenuItem {
   id: string;

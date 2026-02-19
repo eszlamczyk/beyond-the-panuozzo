@@ -1,5 +1,5 @@
-import type { OrderStatus } from '@btp/shared'
-export type { OrderStatus }
+import type { OrderStatus } from '@btp/shared';
+export type { OrderStatus };
 
 export type Food = {
   id: string;
