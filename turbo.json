@@ -6,12 +6,15 @@
       "outputs": ["dist/**", "out/**", ".next/**", "build/**"]
     },
     "lint:check": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "typecheck": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "test": {
+      "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
     "dev": {
