@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
-import { Capability, jwtPayloadSchema } from '../authentication/jwt-payload.schema';
+import {
+  Capability,
+  jwtPayloadSchema,
+} from '../authentication/jwt-payload.schema';
 
 export const REQUIRED_CAPABILITY_KEY = 'requiredCapability';
 

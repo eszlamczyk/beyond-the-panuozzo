@@ -14,7 +14,7 @@ export class OrderResponseDto {
   managerId!: string;
 
   @ApiProperty({ required: false })
-  managerName?: string;
+  managerName?: string | undefined;
 
   @ApiProperty({ type: [OrderItemResponseDto] })
   items!: OrderItemResponseDto[];

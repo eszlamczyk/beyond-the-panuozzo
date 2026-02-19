@@ -37,15 +37,15 @@ function buildMockParticipants(currentUserId: string): Participant[] {
       userId: 'alice-id',
       name: 'Alice',
       wishlist: [
-        { menuItem: MOCK_MENU[4], desireLevel: 4 }, // Margherita whole
-        { menuItem: MOCK_MENU[7], desireLevel: 2 }, // Vegana half
+        { menuItem: MOCK_MENU[4]!, desireLevel: 4 }, // Margherita whole
+        { menuItem: MOCK_MENU[7]!, desireLevel: 2 }, // Vegana half
       ],
     },
     {
       userId: 'bob-id',
       name: 'Bob',
       wishlist: [
-        { menuItem: MOCK_MENU[3], desireLevel: 5 }, // Diavola half
+        { menuItem: MOCK_MENU[3]!, desireLevel: 5 }, // Diavola half
       ],
     },
   ];
@@ -84,6 +84,7 @@ function buildFinalizedOrder(participants: Participant[]): FinalizedOrder {
   for (const [, halves] of halfsByName) {
     for (let i = 0; i < halves.length; i += 2) {
       const first = halves[i];
+      if (!first) continue;
       const second = halves[i + 1];
       const wholeItem =
         MOCK_MENU.find((m) => m.name === first.menuItem.name && !m.isHalf) ??

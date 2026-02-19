@@ -25,6 +25,7 @@ export function registerOrderCommands(
         if (menuItemId) {
           return removeWishlistItem(orderService, menuItemId);
         }
+        return undefined;
       },
     ),
   );

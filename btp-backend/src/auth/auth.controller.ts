@@ -91,9 +91,7 @@ export class AuthController {
       capability === 'admin' &&
       !this.authzConfig.adminEmails.includes(user.email.toLowerCase())
     ) {
-      throw new ForbiddenException(
-        'Your account does not have admin access.',
-      );
+      throw new ForbiddenException('Your account does not have admin access.');
     }
 
     const refreshTokenUser = {

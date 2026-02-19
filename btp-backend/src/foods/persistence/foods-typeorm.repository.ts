@@ -19,7 +19,7 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
     const foods = await this.foodsRepository.find({
       relations: ['type'],
     });
-    return foods.map(FoodMapper.toDomain);
+    return foods.map((food) => FoodMapper.toDomain(food));
   }
 
   async findOne(id: string): Promise<FoodModel> {

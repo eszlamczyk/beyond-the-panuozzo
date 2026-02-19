@@ -10,13 +10,13 @@ export class OrderItemResponseDto {
   userId!: string;
 
   @ApiProperty({ required: false })
-  userName?: string;
+  userName?: string | undefined;
 
   @ApiProperty()
   foodId!: string;
 
   @ApiProperty({ required: false })
-  foodName?: string;
+  foodName?: string | undefined;
 
   @ApiProperty({ enum: PanuozzoSize })
   size!: PanuozzoSize;

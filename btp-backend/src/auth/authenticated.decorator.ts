@@ -1,5 +1,5 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
-import { Capability } from './authentication/jwt-payload.schema';
+import type { Capability } from './authentication/jwt-payload.schema';
 import { JwtAuthenticationGuard } from './authentication/jwt-authentication.guard';
 import { EmailDomainGuard } from './authorization/email-domain.guard';
 import {
@@ -20,7 +20,5 @@ import {
 export const Authenticated = (capability?: Capability) =>
   applyDecorators(
     UseGuards(JwtAuthenticationGuard, EmailDomainGuard, CapabilityGuard),
-    ...(capability
-      ? [SetMetadata(REQUIRED_CAPABILITY_KEY, capability)]
-      : []),
+    ...(capability ? [SetMetadata(REQUIRED_CAPABILITY_KEY, capability)] : []),
   );

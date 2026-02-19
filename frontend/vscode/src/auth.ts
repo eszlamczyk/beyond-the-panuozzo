@@ -260,7 +260,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
         return undefined;
       }
       const payload: unknown = JSON.parse(
-        Buffer.from(parts[1], 'base64url').toString(),
+        Buffer.from(parts[1]!, 'base64url').toString(),
       );
       if (
         typeof payload !== 'object' ||
