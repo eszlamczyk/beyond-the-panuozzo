@@ -1,4 +1,4 @@
-import type { OrderStatus } from '../order-status.enum';
+import type { OrderStatus } from '@btp/shared';
 import type { OrderModel } from './order.model';
 
 export abstract class OrdersRepositoryPort {

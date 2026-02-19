@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrderStatus } from '../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 import { OrderModel } from '../domain/order.model';
 import { OrdersRepositoryPort } from '../domain/orders-repository.port';
 import { Order } from './order.entity';

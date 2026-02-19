@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { OrderStatus } from '@btp/shared';
 import type { OrderService } from './order.service';
 import { Commands } from '../constants';
 import type { DesireLevel, MenuItem, Order, WishlistItem } from '../types';
@@ -60,9 +61,7 @@ export class OrderTreeDataProvider
         return treeItem('No active order', { icon: 'package' });
 
       case 'order-header': {
-        const status =
-          node.order.status.charAt(0).toUpperCase() +
-          node.order.status.slice(1);
+        const status = formatOrderStatus(node.order.status);
         return treeItem(`Order #${node.order.id} (${status})`, {
           icon: 'package',
           state: Expanded,
@@ -162,7 +161,7 @@ export class OrderTreeDataProvider
    * everything into the resolved line items.
    */
   private getOrderChildren(order: Order): TreeNode[] {
-    if (order.status === 'finalized') {
+    if (order.status !== OrderStatus.DRAFT) {
       return [{ kind: 'finalized-header' }];
     }
 
@@ -233,6 +232,17 @@ function treeItem(label: string, opts: TreeItemOptions): vscode.TreeItem {
     item.command = opts.command;
   }
   return item;
+}
+
+const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  [OrderStatus.DRAFT]: 'Draft',
+  [OrderStatus.TO_ORDER]: 'To Order',
+  [OrderStatus.ORDERED]: 'Ordered',
+  [OrderStatus.EATEN]: 'Eaten',
+};
+
+function formatOrderStatus(status: OrderStatus): string {
+  return ORDER_STATUS_LABELS[status] ?? 'Unknown';
 }
 
 function formatMenuItem(menuItem: MenuItem): string {

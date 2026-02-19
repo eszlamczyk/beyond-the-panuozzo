@@ -4,8 +4,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Actor } from '../../auth/authorization/actor';
-import { OrderStatus } from '../order-status.enum';
-import type { PanuozzoSize } from '../panuozzo-size.enum';
+import { OrderStatus } from '@btp/shared';
+import type { PanuozzoSize } from '@btp/shared';
 import { OrderEventsService } from './order-events.service';
 import { OrdersService } from './orders.service';
 import { WishlistItem } from './wishlist.model';

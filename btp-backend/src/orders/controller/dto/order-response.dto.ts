@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus } from '../../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 import { OrderModel } from '../../domain/order.model';
 import { OrderItemResponseDto } from './order-item-response.dto';
 

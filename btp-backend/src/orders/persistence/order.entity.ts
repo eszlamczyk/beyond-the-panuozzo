@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { OrderStatus } from '../order-status.enum';
+import { OrderStatus } from '@btp/shared';
 import { User } from '../../users/persistence/user.entity';
 import { UserOrder } from './user-order.entity';
 import { Wishlist } from './wishlist.entity';

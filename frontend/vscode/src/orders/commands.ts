@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { OrderStatus } from '@btp/shared';
 import type { OrderService } from './order.service';
 import { Commands } from '../constants';
 import type { DesireLevel } from '../types';
@@ -45,7 +46,7 @@ export function registerOrderCommands(
  */
 async function addWishlistItem(orderService: OrderService): Promise<void> {
   const order = orderService.getOrder();
-  if (!order || order.status !== 'draft') {
+  if (!order || order.status !== OrderStatus.DRAFT) {
     vscode.window.showWarningMessage('No active draft order.');
     return;
   }

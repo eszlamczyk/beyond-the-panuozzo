@@ -1,5 +1,5 @@
 {
-  "name": "beyond-the-panuozzo",
+  "name": "beyond-the-panuozzo-vscode",
   "displayName": "Beyond the Panuozzo",
   "description": "Beyond the Panuozzo VSCode extension",
   "version": "0.0.1",
@@ -85,12 +85,12 @@
   },
   "scripts": {
     "build": "tsc -p ./",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "npm run build",
+    "dev": "tsc -watch -p ./",
+    "watch": "npm run dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --fix",
     "lint:check": "eslint src/ --max-warnings=0",
-    "lint:fix": "eslint src/ --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "echo \"No tests configured yet\" && exit 0"
@@ -107,6 +107,7 @@
     "typescript-eslint": "^8.55.0"
   },
   "dependencies": {
+    "@btp/shared": "workspace:*",
     "zod": "^4.3.6"
   }
 }

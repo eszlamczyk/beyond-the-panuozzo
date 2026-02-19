@@ -8,7 +8,7 @@ import {
 import { User } from '../../users/persistence/user.entity';
 import { Order } from './order.entity';
 import { Food } from '../../foods/persistence/food.entity';
-import { PanuozzoSize } from '../panuozzo-size.enum';
+import { PanuozzoSize } from '@btp/shared';
 
 @Entity('user_orders')
 export class UserOrder {

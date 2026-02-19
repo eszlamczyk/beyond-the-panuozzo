@@ -1,0 +1,4 @@
+packages:
+  - 'btp-backend'
+  - 'frontend/*'
+  - 'packages/*'

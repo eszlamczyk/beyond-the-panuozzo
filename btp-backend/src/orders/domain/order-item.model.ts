@@ -1,4 +1,4 @@
-import type { PanuozzoSize } from '../panuozzo-size.enum';
+import type { PanuozzoSize } from '@btp/shared';
 
 export interface OrderItemModel {
   id: string;
