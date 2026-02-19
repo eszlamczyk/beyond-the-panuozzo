@@ -30,12 +30,25 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-export async function apiFetch<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
-  const { token } = useAuthStore.getState();
+async function parseErrorMessage(response: Response): Promise<string> {
+  try {
+    const body: unknown = await response.json();
+    if (body && typeof body === 'object' && 'message' in body) {
+      const msg = (body as { message: unknown }).message;
+      if (typeof msg === 'string') return msg;
+      if (Array.isArray(msg) && typeof msg[0] === 'string') return msg[0];
+    }
+  } catch {
+    // no parseable body
+  }
+  return response.statusText;
+}
 
+async function fetchWithRetry(
+  path: string,
+  init: RequestInit | undefined,
+  token: string | null,
+): Promise<Response> {
   const doFetch = (accessToken: string | null) =>
     fetch(`${API_BASE_URL}${path}`, {
       ...init,
@@ -47,14 +60,24 @@ export async function apiFetch<T>(
       },
     });
 
-  let response = await doFetch(token);
+  const response = await doFetch(token);
 
   if (response.status === 401 && token) {
     const newToken = await refreshAccessToken();
-    if (newToken) {
-      response = await doFetch(newToken);
-    }
+    if (newToken) return doFetch(newToken);
   }
+
+  return response;
+}
+
+export async function apiFetch(path: string, init?: RequestInit): Promise<void>;
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T>;
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T | void> {
+  const { token } = useAuthStore.getState();
+  const response = await fetchWithRetry(path, init, token);
 
   if (response.status === 401) {
     useAuthStore.getState().clearToken();
@@ -62,7 +85,11 @@ export async function apiFetch<T>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, response.statusText);
+    throw new ApiError(response.status, await parseErrorMessage(response));
+  }
+
+  if (response.status === 204) {
+    return undefined;
   }
 
   return response.json() as Promise<T>;

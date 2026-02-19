@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { FoodModel } from './food.model';
 import { FoodsRepositoryPort } from './foods-repository.port';
 
@@ -12,5 +12,30 @@ export class FoodsService {
 
   async findOne(id: string): Promise<FoodModel> {
     return this.foodsRepository.findOne(id);
+  }
+
+  async create(data: {
+    name: string;
+    price: number;
+    typeId: string;
+  }): Promise<FoodModel> {
+    return this.foodsRepository.create(data);
+  }
+
+  async update(
+    id: string,
+    data: Partial<{ name: string; price: number; typeId: string }>,
+  ): Promise<FoodModel> {
+    return this.foodsRepository.update(id, data);
+  }
+
+  async remove(id: string): Promise<void> {
+    const used = await this.foodsRepository.isUsed(id);
+    if (used) {
+      throw new ConflictException(
+        'Cannot delete food that is used in orders or wishlists',
+      );
+    }
+    return this.foodsRepository.remove(id);
   }
 }

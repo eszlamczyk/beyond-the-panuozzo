@@ -1,5 +1,11 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { LogOut, UtensilsCrossed, Users, ShoppingCart } from 'lucide-react';
+import {
+  LogOut,
+  Tags,
+  UtensilsCrossed,
+  Users,
+  ShoppingCart,
+} from 'lucide-react';
 import { useAuthStore } from '@/auth/auth-store';
 import { apiFetch } from '@/api/client';
 import {
@@ -17,6 +23,7 @@ import {
 
 const navItems = [
   { title: 'Foods', to: '/foods' as const, icon: UtensilsCrossed },
+  { title: 'Food Types', to: '/food-types' as const, icon: Tags },
   { title: 'Users', to: '/users' as const, icon: Users },
   { title: 'Orders', to: '/orders' as const, icon: ShoppingCart },
 ];

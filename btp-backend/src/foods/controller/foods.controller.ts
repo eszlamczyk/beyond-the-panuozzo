@@ -1,8 +1,20 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Authenticated } from '../../auth/authenticated.decorator';
 import { FoodsService } from '../domain/foods.service';
 import { FoodResponseDto } from './dto/food-response.dto';
+import { CreateFoodRequestDto } from './dto/create-food-request.dto';
+import { UpdateFoodRequestDto } from './dto/update-food-request.dto';
 
 @Authenticated()
 @ApiTags('Foods')
@@ -20,5 +32,29 @@ export class FoodsController {
   async findOne(@Param('id') id: string): Promise<FoodResponseDto> {
     const food = await this.foodsService.findOne(id);
     return FoodResponseDto.fromDomain(food);
+  }
+
+  @Authenticated('admin')
+  @Post()
+  async create(@Body() dto: CreateFoodRequestDto): Promise<FoodResponseDto> {
+    const food = await this.foodsService.create(dto);
+    return FoodResponseDto.fromDomain(food);
+  }
+
+  @Authenticated('admin')
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateFoodRequestDto,
+  ): Promise<FoodResponseDto> {
+    const food = await this.foodsService.update(id, dto);
+    return FoodResponseDto.fromDomain(food);
+  }
+
+  @Authenticated('admin')
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.foodsService.remove(id);
   }
 }

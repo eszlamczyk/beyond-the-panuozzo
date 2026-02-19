@@ -5,7 +5,20 @@ export type Food = {
   id: string;
   name: string;
   price: number;
-  typeName?: string;
+  typeId: string;
+  typeName: string;
+};
+
+export type CreateFoodRequest = {
+  name: string;
+  price: number;
+  typeId: string;
+};
+
+export type UpdateFoodRequest = {
+  name?: string;
+  price?: number;
+  typeId?: string;
 };
 
 export type FoodType = {
