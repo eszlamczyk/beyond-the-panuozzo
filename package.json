@@ -12,7 +12,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
-    "turbo": "latest"
+    "turbo": "^2.8.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
