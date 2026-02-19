@@ -70,14 +70,8 @@ async function fetchWithRetry(
   return response;
 }
 
-export async function apiFetch(
-  path: string,
-  init?: RequestInit,
-): Promise<void>;
-export async function apiFetch<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T>;
+export async function apiFetch(path: string, init?: RequestInit): Promise<void>;
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T>;
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
