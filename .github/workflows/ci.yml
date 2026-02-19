@@ -19,6 +19,7 @@ jobs:
 
   build:
     if: '! github.event.pull_request.draft'
-    name: Build
+    # Name must match the required status check in branch protection rules
+    name: Build (btp-backend)
     uses: ./.github/workflows/build.yml
     secrets: inherit
