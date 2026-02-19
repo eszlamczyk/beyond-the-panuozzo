@@ -1,6 +1,6 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { FoodsService } from './foods.service';
 import { FoodsRepositoryPort } from './foods-repository.port';
 import type { FoodModel } from './food.model';
@@ -13,6 +13,7 @@ describe('FoodsService', () => {
     id: 'uuid',
     name: 'Margherita',
     price: 2500,
+    typeId: 'type-uuid',
     typeName: 'Pizza',
   };
 
@@ -20,6 +21,10 @@ describe('FoodsService', () => {
     const mockRepository: jest.Mocked<FoodsRepositoryPort> = {
       findAll: jest.fn(),
       findOne: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      remove: jest.fn(),
+      isUsed: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -48,6 +53,22 @@ describe('FoodsService', () => {
         new NotFoundException('Food with ID "uuid" not found'),
       );
       await expect(service.findOne('uuid')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove food when not used', async () => {
+      repository.isUsed.mockResolvedValue(false);
+      repository.remove.mockResolvedValue(undefined);
+      await service.remove('uuid');
+      expect(repository.isUsed).toHaveBeenCalledWith('uuid'); // eslint-disable-line @typescript-eslint/unbound-method
+      expect(repository.remove).toHaveBeenCalledWith('uuid'); // eslint-disable-line @typescript-eslint/unbound-method
+    });
+
+    it('should throw ConflictException when food is used', async () => {
+      repository.isUsed.mockResolvedValue(true);
+      await expect(service.remove('uuid')).rejects.toThrow(ConflictException);
+      expect(repository.remove).not.toHaveBeenCalled(); // eslint-disable-line @typescript-eslint/unbound-method
     });
   });
 });

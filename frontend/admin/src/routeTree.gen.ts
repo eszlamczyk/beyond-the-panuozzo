@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as FoodsIndexRouteImport } from './routes/foods/index'
+import { Route as FoodTypesIndexRouteImport } from './routes/food-types/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 
 const LoginRoute = LoginRouteImport.update({
@@ -41,6 +42,11 @@ const FoodsIndexRoute = FoodsIndexRouteImport.update({
   path: '/foods/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FoodTypesIndexRoute = FoodTypesIndexRouteImport.update({
+  id: '/food-types/',
+  path: '/food-types/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/food-types/': typeof FoodTypesIndexRoute
   '/foods/': typeof FoodsIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/users/': typeof UsersIndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/food-types': typeof FoodTypesIndexRoute
   '/foods': typeof FoodsIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/users': typeof UsersIndexRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/food-types/': typeof FoodTypesIndexRoute
   '/foods/': typeof FoodsIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/users/': typeof UsersIndexRoute
@@ -78,16 +87,25 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/auth/callback'
+    | '/food-types/'
     | '/foods/'
     | '/orders/'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/auth/callback' | '/foods' | '/orders' | '/users'
+  to:
+    | '/'
+    | '/login'
+    | '/auth/callback'
+    | '/food-types'
+    | '/foods'
+    | '/orders'
+    | '/users'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/auth/callback'
+    | '/food-types/'
     | '/foods/'
     | '/orders/'
     | '/users/'
@@ -97,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  FoodTypesIndexRoute: typeof FoodTypesIndexRoute
   FoodsIndexRoute: typeof FoodsIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
@@ -139,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FoodsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/food-types/': {
+      id: '/food-types/'
+      path: '/food-types'
+      fullPath: '/food-types/'
+      preLoaderRoute: typeof FoodTypesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -153,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  FoodTypesIndexRoute: FoodTypesIndexRoute,
   FoodsIndexRoute: FoodsIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   UsersIndexRoute: UsersIndexRoute,

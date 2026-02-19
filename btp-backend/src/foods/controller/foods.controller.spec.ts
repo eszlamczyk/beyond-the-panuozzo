@@ -17,6 +17,7 @@ describe('FoodsController', () => {
     id: mockFoodId,
     name: 'Test Food',
     price: 1000,
+    typeId: 'type-uuid',
     typeName: 'Test Type',
   };
 
@@ -52,6 +53,7 @@ describe('FoodsController', () => {
       id: mockFoodId,
       name: 'Test Food',
       price: 1000,
+      typeId: 'type-uuid',
       typeName: 'Test Type',
     });
   });

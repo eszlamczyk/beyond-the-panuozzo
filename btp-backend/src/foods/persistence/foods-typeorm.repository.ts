@@ -1,16 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { Food } from './food.entity';
+import type { FoodType } from './food-type.entity';
 import { FoodMapper } from './food.mapper';
 import { FoodModel } from '../domain/food.model';
 import { FoodsRepositoryPort } from '../domain/foods-repository.port';
+import { UserOrder } from '../../orders/persistence/user-order.entity';
+import { Wishlist } from '../../orders/persistence/wishlist.entity';
 
 @Injectable()
 export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
   constructor(
     @InjectRepository(Food)
     private readonly foodsRepository: Repository<Food>,
+    @InjectRepository(UserOrder)
+    private readonly userOrdersRepository: Repository<UserOrder>,
+    @InjectRepository(Wishlist)
+    private readonly wishlistRepository: Repository<Wishlist>,
   ) {
     super();
   }
@@ -31,5 +42,68 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
       throw new NotFoundException(`Food with ID "${id}" not found`);
     }
     return FoodMapper.toDomain(food);
+  }
+
+  async create(data: {
+    name: string;
+    price: number;
+    typeId: string;
+  }): Promise<FoodModel> {
+    const food = this.foodsRepository.create({
+      name: data.name,
+      price: data.price,
+      type: { id: data.typeId },
+    });
+    const saved = await this.foodsRepository.save(food);
+    return this.findOne(saved.id);
+  }
+
+  async update(
+    id: string,
+    data: Partial<{ name: string; price: number; typeId: string }>,
+  ): Promise<FoodModel> {
+    const food = await this.foodsRepository.findOne({
+      where: { id },
+      relations: ['type'],
+    });
+    if (!food) {
+      throw new NotFoundException(`Food with ID "${id}" not found`);
+    }
+
+    if (data.name !== undefined) food.name = data.name;
+    if (data.price !== undefined) food.price = data.price;
+    if (data.typeId !== undefined) food.type = { id: data.typeId } as FoodType;
+
+    await this.foodsRepository.save(food);
+    return this.findOne(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    const food = await this.foodsRepository.findOneBy({ id });
+    if (!food) {
+      throw new NotFoundException(`Food with ID "${id}" not found`);
+    }
+    try {
+      await this.foodsRepository.remove(food);
+    } catch (error) {
+      if (error instanceof QueryFailedError && (error.driverError as { code?: string })?.code === '23503') {
+        throw new ConflictException(
+          'Cannot delete food that is used in orders or wishlists',
+        );
+      }
+      throw error;
+    }
+  }
+
+  async isUsed(id: string): Promise<boolean> {
+    const orderCount = await this.userOrdersRepository.count({
+      where: { food: { id } },
+    });
+    if (orderCount > 0) return true;
+
+    const wishlistCount = await this.wishlistRepository.count({
+      where: { food: { id } },
+    });
+    return wishlistCount > 0;
   }
 }

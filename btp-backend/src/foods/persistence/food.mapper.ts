@@ -7,7 +7,8 @@ export class FoodMapper {
       id: entity.id,
       name: entity.name,
       price: entity.price,
-      typeName: entity.type?.type,
+      typeId: entity.type.id,
+      typeName: entity.type.type,
     };
   }
 }
