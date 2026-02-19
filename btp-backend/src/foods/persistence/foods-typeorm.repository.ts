@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { Food } from './food.entity';
-import type { FoodType } from './food-type.entity';
+import { FoodType } from './food-type.entity';
 import { FoodMapper } from './food.mapper';
 import { FoodModel } from '../domain/food.model';
 import { FoodsRepositoryPort } from '../domain/foods-repository.port';
@@ -18,6 +18,8 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
   constructor(
     @InjectRepository(Food)
     private readonly foodsRepository: Repository<Food>,
+    @InjectRepository(FoodType)
+    private readonly foodTypeRepository: Repository<FoodType>,
     @InjectRepository(UserOrder)
     private readonly userOrdersRepository: Repository<UserOrder>,
     @InjectRepository(Wishlist)
@@ -49,13 +51,31 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
     price: number;
     typeId: string;
   }): Promise<FoodModel> {
+    const foodType = await this.foodTypeRepository.findOneBy({
+      id: data.typeId,
+    });
+    if (!foodType) {
+      throw new NotFoundException(
+        `Food type with ID "${data.typeId}" not found`,
+      );
+    }
     const food = this.foodsRepository.create({
       name: data.name,
       price: data.price,
-      type: { id: data.typeId },
+      type: foodType,
     });
-    const saved = await this.foodsRepository.save(food);
-    return this.findOne(saved.id);
+    try {
+      const saved = await this.foodsRepository.save(food);
+      return this.findOne(saved.id);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string })?.code === '23503'
+      ) {
+        throw new ConflictException('Foreign key constraint violation');
+      }
+      throw error;
+    }
   }
 
   async update(
@@ -72,10 +92,30 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
 
     if (data.name !== undefined) food.name = data.name;
     if (data.price !== undefined) food.price = data.price;
-    if (data.typeId !== undefined) food.type = { id: data.typeId } as FoodType;
+    if (data.typeId !== undefined) {
+      const foodType = await this.foodTypeRepository.findOneBy({
+        id: data.typeId,
+      });
+      if (!foodType) {
+        throw new NotFoundException(
+          `Food type with ID "${data.typeId}" not found`,
+        );
+      }
+      food.type = foodType;
+    }
 
-    await this.foodsRepository.save(food);
-    return this.findOne(id);
+    try {
+      await this.foodsRepository.save(food);
+      return this.findOne(id);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string })?.code === '23503'
+      ) {
+        throw new ConflictException('Foreign key constraint violation');
+      }
+      throw error;
+    }
   }
 
   async remove(id: string): Promise<void> {
