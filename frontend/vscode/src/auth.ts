@@ -94,7 +94,7 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     const backendUrl = this.getBackendUrl();
     const callbackUri = this.getCallbackUri();
 
-    const authUrl = `${backendUrl}${ApiPaths.AuthGoogle}?redirect_uri=${encodeURIComponent(callbackUri)}`;
+    const authUrl = `${backendUrl}${ApiPaths.AuthGoogle}?redirect_uri=${encodeURIComponent(callbackUri)}&capability=user`;
 
     await vscode.env.openExternal(vscode.Uri.parse(authUrl));
   }
