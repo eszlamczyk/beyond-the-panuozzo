@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router';
 import { useAuthStore } from '@/auth/auth-store';
 
 type CallbackSearch = {
