@@ -70,10 +70,18 @@ async function fetchWithRetry(
   return response;
 }
 
+export async function apiFetch(
+  path: string,
+  init?: RequestInit,
+): Promise<void>;
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
-): Promise<T> {
+): Promise<T>;
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T | void> {
   const { token } = useAuthStore.getState();
   const response = await fetchWithRetry(path, init, token);
 
@@ -87,7 +95,7 @@ export async function apiFetch<T>(
   }
 
   if (response.status === 204) {
-    return undefined as T;
+    return undefined;
   }
 
   return response.json() as Promise<T>;
