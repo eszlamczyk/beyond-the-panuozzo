@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useAuthStore } from '@/auth/auth-store';
 import { API_BASE_URL } from '@/api/client';
 import { Button } from '@/components/ui/button';
@@ -11,16 +11,16 @@ import {
 } from '@/components/ui/card';
 
 export const Route = createFileRoute('/login')({
+  beforeLoad: () => {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      throw redirect({ to: '/foods' });
+    }
+  },
   component: LoginPage,
 });
 
 function LoginPage() {
-  const token = useAuthStore((s) => s.token);
-
-  if (token) {
-    return <Navigate to="/foods" />;
-  }
-
   const callbackUrl = `${window.location.origin}/auth/callback`;
   const googleAuthUrl = `${API_BASE_URL}/auth/google?redirect_uri=${encodeURIComponent(callbackUrl)}&capability=admin`;
 

@@ -17,7 +17,9 @@ export const Route = createRootRoute({
 function RootLayout() {
   const matches = useMatches();
   const currentPath = matches[matches.length - 1]?.pathname ?? '';
-  const isPublicRoute = PUBLIC_ROUTES.some((r) => currentPath.startsWith(r));
+  const isPublicRoute = PUBLIC_ROUTES.some(
+    (r) => currentPath === r || currentPath.startsWith(r + '/'),
+  );
 
   if (isPublicRoute) {
     return <Outlet />;

@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { AuthenticationService } from './authentication.service';
 import { capabilitySchema } from './jwt-payload.schema';
 
+const DEFAULT_CAPABILITY = 'user' as const;
+
 /** Expected query parameters for authentication request. */
 const googleAuthQuerySchema = z.object({
   redirect_uri: z.string().min(1),
@@ -50,7 +52,7 @@ export class GoogleAuthenticationGuard extends AuthGuard('google') {
     const statePayload = JSON.stringify({
       redirectUri,
       clientState,
-      capability: capability ?? 'user',
+      capability: capability ?? DEFAULT_CAPABILITY,
     });
     const encodedState = Buffer.from(statePayload).toString('base64url');
 

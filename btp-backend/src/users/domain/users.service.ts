@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { UserModel } from './user.model';
-import { UsersRepositoryPort } from './users-repository.port';
+import { PaginatedResult, UsersRepositoryPort } from './users-repository.port';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepositoryPort) {}
 
-  findAll(): Promise<UserModel[]> {
-    return this.usersRepository.findAll();
+  findAll(page?: number, limit?: number): Promise<PaginatedResult<UserModel>> {
+    return this.usersRepository.findAll(page, limit);
   }
 
   async findOne(id: string): Promise<UserModel> {

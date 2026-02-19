@@ -9,6 +9,8 @@ import {
   SecretKeys,
 } from './constants';
 
+const CAPABILITY_USER = 'user' as const;
+
 const RefreshResponseSchema = z.object({
   token: z.string(),
   refresh_token: z.string(),
@@ -94,9 +96,11 @@ export class AuthService implements vscode.UriHandler, vscode.Disposable {
     const backendUrl = this.getBackendUrl();
     const callbackUri = this.getCallbackUri();
 
-    const authUrl = `${backendUrl}${ApiPaths.AuthGoogle}?redirect_uri=${encodeURIComponent(callbackUri)}&capability=user`;
+    const authUrl = new URL(ApiPaths.AuthGoogle, backendUrl);
+    authUrl.searchParams.set('redirect_uri', callbackUri);
+    authUrl.searchParams.set('capability', CAPABILITY_USER);
 
-    await vscode.env.openExternal(vscode.Uri.parse(authUrl));
+    await vscode.env.openExternal(vscode.Uri.parse(authUrl.toString()));
   }
 
   /** Revokes server-side tokens, clears local storage, and notifies listeners. */

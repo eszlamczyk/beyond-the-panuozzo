@@ -133,9 +133,7 @@ export class AuthController {
       res.cookie(
         REFRESH_TOKEN_COOKIE,
         refreshToken,
-        refreshTokenCookieOptions(
-          this.authnConfig.refreshToken.lifetimeDays,
-        ),
+        refreshTokenCookieOptions(this.authnConfig.refreshToken.lifetimeDays),
       );
       res.redirect(targetUrl);
       return;

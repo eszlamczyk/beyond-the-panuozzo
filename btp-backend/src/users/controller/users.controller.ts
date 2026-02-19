@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query, SetMetadata } from '@nestjs/common';
 import { Authenticated } from '../../auth/authenticated.decorator';
+import { REQUIRED_CAPABILITY_KEY } from '../../auth/authorization/capability.guard';
 import { UsersService } from '../domain/users.service';
 import { UserResponseDto } from './dto/user-response.dto';
 
@@ -8,11 +9,17 @@ import { UserResponseDto } from './dto/user-response.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Authenticated('admin')
+  @SetMetadata(REQUIRED_CAPABILITY_KEY, 'admin')
   @Get()
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.usersService.findAll();
-    return users.map((user) => UserResponseDto.fromDomain(user));
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    const result = await this.usersService.findAll(
+      page ? parseInt(page, 10) : undefined,
+      limit ? parseInt(limit, 10) : undefined,
+    );
+    return {
+      ...result,
+      items: result.items.map((user) => UserResponseDto.fromDomain(user)),
+    };
   }
 
   @Get(':id')

@@ -14,7 +14,10 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin: allowedOrigins.split(',').map((o) => o.trim()),
+    origin: allowedOrigins
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
     credentials: true,
   });
 

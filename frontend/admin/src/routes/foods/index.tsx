@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatPrice } from '@/lib/format-price';
 
 export const Route = createFileRoute('/foods/')({
   component: FoodsPage,
@@ -84,8 +85,4 @@ function FoodsPage() {
       </div>
     </div>
   );
-}
-
-function formatPrice(grosze: number): string {
-  return `${(grosze / 100).toFixed(2)} zł`;
 }

@@ -15,7 +15,7 @@ export class WishlistResponseDto {
   @ApiProperty()
   foodId!: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false, nullable: true, type: String })
   foodName?: string | undefined;
 
   @ApiProperty()
