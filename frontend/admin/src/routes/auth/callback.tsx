@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { createFileRoute, Navigate, useSearch } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuthStore } from '@/auth/auth-store';
 
 type CallbackSearch = {
@@ -16,18 +16,14 @@ export const Route = createFileRoute('/auth/callback')({
 function AuthCallback() {
   const { token } = useSearch({ from: '/auth/callback' });
   const setToken = useAuthStore((s) => s.setToken);
-  const [saved, setSaved] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
       setToken(token);
-      setSaved(true);
+      navigate({ to: '/foods', replace: true });
     }
-  }, [token, setToken]);
-
-  if (saved) {
-    return <Navigate to="/foods" />;
-  }
+  }, [token, setToken, navigate]);
 
   if (!token) {
     return (
