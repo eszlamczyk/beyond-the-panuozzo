@@ -23,3 +23,16 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# OS
+.DS_Store
+
+# IDE
+.idea
+.vscode
+
+# Playwright MCP
+.playwright-mcp
+
+# Claude/Amp
+.claude/settings.local.json
