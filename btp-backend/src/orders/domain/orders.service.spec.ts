@@ -15,10 +15,9 @@ const mockRepository: jest.Mocked<OrdersRepositoryPort> = {
   delete: jest.fn(),
 };
 
-const mockEventsService: jest.Mocked<OrderEventsService> = {
+const mockEventsService: jest.Mocked<Pick<OrderEventsService, 'emit'>> = {
   emit: jest.fn(),
-  subscribe: jest.fn(),
-} as any;
+};
 
 describe('OrdersService', () => {
   let service: OrdersService;
