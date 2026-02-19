@@ -6,6 +6,10 @@ import { FoodsRepositoryPort } from './foods-repository.port';
 export class FoodsService {
   constructor(private readonly foodsRepository: FoodsRepositoryPort) {}
 
+  findAll(): Promise<FoodModel[]> {
+    return this.foodsRepository.findAll();
+  }
+
   async findOne(id: string): Promise<FoodModel> {
     return this.foodsRepository.findOne(id);
   }

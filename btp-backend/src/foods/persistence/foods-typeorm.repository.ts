@@ -15,6 +15,13 @@ export class FoodsTypeOrmRepository extends FoodsRepositoryPort {
     super();
   }
 
+  async findAll(): Promise<FoodModel[]> {
+    const foods = await this.foodsRepository.find({
+      relations: ['type'],
+    });
+    return foods.map(FoodMapper.toDomain);
+  }
+
   async findOne(id: string): Promise<FoodModel> {
     const food = await this.foodsRepository.findOne({
       where: { id },

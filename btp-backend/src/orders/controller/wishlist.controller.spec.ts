@@ -29,7 +29,12 @@ const mockFoodId = 'food-uuid-456';
 const mockWishlistId = 'wishlist-uuid-789';
 
 const mockReq = {
-  user: { sub: 'google-id-123', email: 'alice@example.com', name: 'Alice' },
+  user: {
+    sub: 'google-id-123',
+    email: 'alice@example.com',
+    name: 'Alice',
+    capability: 'user',
+  },
 } as unknown as Request;
 
 describe('WishlistController', () => {

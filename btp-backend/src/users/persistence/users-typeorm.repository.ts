@@ -15,6 +15,11 @@ export class UsersTypeOrmRepository extends UsersRepositoryPort {
     super();
   }
 
+  async findAll(): Promise<UserModel[]> {
+    const users = await this.usersRepository.find();
+    return users.map(UserMapper.toDomain);
+  }
+
   async findOne(id: string): Promise<UserModel> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {

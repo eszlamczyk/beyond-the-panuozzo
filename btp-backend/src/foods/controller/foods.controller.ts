@@ -10,6 +10,12 @@ import { FoodResponseDto } from './dto/food-response.dto';
 export class FoodsController {
   constructor(private readonly foodsService: FoodsService) {}
 
+  @Get()
+  async findAll(): Promise<FoodResponseDto[]> {
+    const foods = await this.foodsService.findAll();
+    return foods.map((food) => FoodResponseDto.fromDomain(food));
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<FoodResponseDto> {
     const food = await this.foodsService.findOne(id);

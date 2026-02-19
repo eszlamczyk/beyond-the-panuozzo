@@ -6,6 +6,10 @@ import { UsersRepositoryPort } from './users-repository.port';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepositoryPort) {}
 
+  findAll(): Promise<UserModel[]> {
+    return this.usersRepository.findAll();
+  }
+
   async findOne(id: string): Promise<UserModel> {
     return this.usersRepository.findOne(id);
   }
