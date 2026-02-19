@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
+  Inject,
   Post,
   Query,
   Req,
@@ -10,10 +12,12 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import type { ConfigType } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 import { Authenticated } from './authenticated.decorator';
 import { EmailDomainGuard } from './authorization/email-domain.guard';
+import { authorizationConfig } from './authorization/authorization.config';
 import { AuthenticationService } from './authentication/authentication.service';
 import { GoogleAuthenticationGuard } from './authentication/google-authentication.guard';
 import { googleUserSchema } from './authentication/google-user.schema';
@@ -41,6 +45,8 @@ export class AuthController {
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly refreshTokenService: RefreshTokenService,
+    @Inject(authorizationConfig.KEY)
+    private readonly authzConfig: ConfigType<typeof authorizationConfig>,
   ) {}
 
   /**
@@ -74,16 +80,32 @@ export class AuthController {
     }
 
     const user = result.data;
-    const { redirectUri, clientState } =
+    const { redirectUri, clientState, capability } =
       this.authenticationService.decodeState(state);
 
     if (!this.authenticationService.validateRedirectUri(redirectUri)) {
       throw new BadRequestException('Invalid redirect_uri in state.');
     }
 
-    const token = this.authenticationService.generateJwt(user);
+    if (
+      capability === 'admin' &&
+      !this.authzConfig.adminEmails.includes(user.email.toLowerCase())
+    ) {
+      throw new ForbiddenException(
+        'Your account does not have admin access.',
+      );
+    }
+
+    const refreshTokenUser = {
+      googleId: user.googleId,
+      email: user.email,
+      displayName: user.displayName,
+      capability,
+    };
+
+    const token = this.authenticationService.generateJwt(user, capability);
     const refreshToken =
-      await this.refreshTokenService.createRefreshToken(user);
+      await this.refreshTokenService.createRefreshToken(refreshTokenUser);
 
     const url = new URL(redirectUri);
     url.searchParams.set('token', token);
@@ -119,7 +141,10 @@ export class AuthController {
     const { newRefreshToken, user } =
       await this.refreshTokenService.rotateRefreshToken(refreshToken);
 
-    const accessToken = this.authenticationService.generateJwt(user);
+    const accessToken = this.authenticationService.generateJwt(
+      user,
+      user.capability,
+    );
 
     return { token: accessToken, refresh_token: newRefreshToken };
   }

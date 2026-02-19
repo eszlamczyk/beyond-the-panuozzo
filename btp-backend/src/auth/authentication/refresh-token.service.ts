@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes, randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { authenticationConfig } from './authentication.config';
+import { Capability } from './jwt-payload.schema';
 import { RefreshToken } from './refresh-token.entity';
 
 export interface RefreshTokenUser {
   googleId: string;
   email: string;
   displayName: string;
+  capability: Capability;
 }
 
 @Injectable()
@@ -87,6 +89,7 @@ export class RefreshTokenService {
       googleId: existing.googleId,
       email: existing.email,
       displayName: existing.displayName,
+      capability: (existing.capability as Capability) ?? 'user',
     };
 
     // Issue a successor token in the same family chain.
@@ -122,6 +125,7 @@ export class RefreshTokenService {
       googleId: user.googleId,
       email: user.email,
       displayName: user.displayName,
+      capability: user.capability,
       expiresAt,
       family,
     });

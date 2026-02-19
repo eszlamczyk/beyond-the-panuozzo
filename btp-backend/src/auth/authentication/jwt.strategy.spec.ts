@@ -25,6 +25,7 @@ describe('JwtStrategy', () => {
       sub: '12345',
       email: 'user@example.com',
       name: 'Test User',
+      capability: 'user',
     };
 
     expect(strategy.validate(payload)).toEqual(payload);

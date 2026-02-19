@@ -4,11 +4,13 @@ import { JwtService } from '@nestjs/jwt';
 import { z } from 'zod';
 import { authenticationConfig } from './authentication.config';
 import { GoogleUser } from './google-user.schema';
+import { Capability, capabilitySchema } from './jwt-payload.schema';
 
 /** Schema for the payload encoded into Google OAuth's `state` parameter. */
 const statePayloadSchema = z.object({
   redirectUri: z.string().min(1),
   clientState: z.string().optional(),
+  capability: capabilitySchema,
 });
 
 /** Shape of the payload encoded into Google OAuth's `state` parameter. */
@@ -34,18 +36,23 @@ export class AuthenticationService {
     return this.config.allowedRedirectUris.includes(uri);
   }
 
-  /** Signs a JWT containing the user's Google ID, email, and display name. */
-  generateJwt(user: GoogleUser): string {
+  /** Signs a JWT containing the user's Google ID, email, display name, and capability. */
+  generateJwt(user: GoogleUser, capability: Capability): string {
     return this.jwtService.sign({
       sub: user.googleId,
       email: user.email,
       name: user.displayName,
+      capability,
     });
   }
 
   /** Base64url-encodes a {@link StatePayload} for use as Google OAuth's `state` param. */
-  encodeState(redirectUri: string, clientState?: string): string {
-    const payload: StatePayload = { redirectUri, clientState };
+  encodeState(
+    redirectUri: string,
+    capability: Capability,
+    clientState?: string,
+  ): string {
+    const payload: StatePayload = { redirectUri, clientState, capability };
     return Buffer.from(JSON.stringify(payload)).toString('base64url');
   }
 

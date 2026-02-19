@@ -27,6 +27,10 @@ export class RefreshToken {
   @Column()
   displayName!: string;
 
+  /** The capability this token was issued for (`'user'` or `'admin'`). */
+  @Column({ default: 'user' })
+  capability!: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

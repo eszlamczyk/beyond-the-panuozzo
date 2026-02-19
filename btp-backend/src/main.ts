@@ -6,6 +6,16 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
+  if (!allowedOrigins) {
+    throw new Error('Missing required environment variable: ALLOWED_ORIGINS');
+  }
+
+  app.enableCors({
+    origin: allowedOrigins.split(',').map((o) => o.trim()),
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
